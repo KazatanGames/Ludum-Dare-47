@@ -24,4 +24,7 @@ public struct GameSetup
     public float dragonChance;
     public float greenPotionTime;
     public float redPotionTime;
+    public float smallTreeChance;
+    public float mediumTreeChance;
+    public float tallTreeChance;
 }

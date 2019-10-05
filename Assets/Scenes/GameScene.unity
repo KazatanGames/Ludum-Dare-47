@@ -437,12 +437,15 @@ MonoBehaviour:
     despawnDistance: 25
     homeDistance: 5
     cauldronDistance: 1.5
-    targetFrogs: 5
-    frogChance: 0.1
-    targetDragons: 1
-    dragonChance: 0.05
+    targetFrogs: 12
+    frogChance: 0.05
+    targetDragons: 2
+    dragonChance: 0.01
     greenPotionTime: 35
     redPotionTime: 35
+    smallTreeChance: 0.1
+    mediumTreeChance: 0.05
+    tallTreeChance: 0.025
   grassTilePrefab: {fileID: 4547290723595503875, guid: 07623d5b5cec5ef4db93ff0f67051f3a,
     type: 3}
   homePrefab: {fileID: 2607342365106496090, guid: 77e4c10f021fde74fa48aceccbdc4eba,
@@ -453,6 +456,10 @@ MonoBehaviour:
     type: 3}
   shieldPrefab: {fileID: 1881274959650880360, guid: be6875db7287c35498c67751c566cd45,
     type: 3}
+  treePrefabs:
+  - {fileID: 8258557967513428101, guid: b526fea1b6d85ea4099681813d9bf33a, type: 3}
+  - {fileID: 1870865833846256969, guid: a64a9826f0d7c964c94648a7a8765cae, type: 3}
+  - {fileID: 5317159149930014523, guid: 2800865091024ab4990719ffd832b446, type: 3}
   uiFrogs: {fileID: 863671205}
   uiDragonScales: {fileID: 833734855}
   uiBookAnimator: {fileID: 309743130}

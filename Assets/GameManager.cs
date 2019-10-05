@@ -29,6 +29,8 @@ public class GameManager : MonoBehaviour
     protected GameObject dragonPrefab;
     [SerializeField]
     protected GameObject shieldPrefab;
+    [SerializeField]
+    protected GameObject[] treePrefabs;
     [Header("UI")]
     [SerializeField]
     protected Text uiFrogs;
@@ -45,6 +47,7 @@ public class GameManager : MonoBehaviour
     protected float greenPotionTime = 0f;
     protected float redPotionTime = 0f;
     protected int shieldLife = 0;
+    protected float treeOffset = 1f;
 
     protected Dictionary<Vector2Int, TileInstance> tiles;
 
@@ -80,6 +83,7 @@ public class GameManager : MonoBehaviour
 
     protected void Initialize()
     {
+        treeOffset = config.tileWidth / 2.5f;
         playerSpeed = new Vector2();
         playerTile = Vector2Int.zero;
         camFov = config.cameraMinFov;
@@ -269,7 +273,7 @@ public class GameManager : MonoBehaviour
         {
             for (int yy = startY; yy < endY; yy++)
             {
-                CheckNewTile(xx, yy, false);
+                CheckNewTile(xx, yy, true, false);
             }
         }
     }
@@ -297,7 +301,7 @@ public class GameManager : MonoBehaviour
 
         for (int yy = playerTile.y - config.tileGenerationDistance; yy < playerTile.y + config.tileGenerationDistance + 1; yy++)
         {
-            CheckNewTile(xx, yy, true);
+            CheckNewTile(xx, yy, true, true);
         }
     }
 
@@ -307,7 +311,7 @@ public class GameManager : MonoBehaviour
 
         for (int xx = playerTile.x - config.tileGenerationDistance; xx < playerTile.x + config.tileGenerationDistance + 1; xx++)
         {
-            CheckNewTile(xx, yy, true);
+            CheckNewTile(xx, yy, true, true);
         }
     }
 
@@ -317,22 +321,42 @@ public class GameManager : MonoBehaviour
         uiDragonScales.text = inv.dragonScales.ToString();
     }
 
-    protected void CheckNewTile(int x, int y, bool spawn)
+    protected void CheckNewTile(int x, int y, bool spawnTree, bool spawnEnemy)
     {
         Vector2Int pos = new Vector2Int(x, y);
         if (!tiles.ContainsKey(pos))
         {
             NewTile(pos);
+        } else
+        {
+            spawnTree = false;
         }
 
-        if (spawn && Vector2Int.Distance(pos, Vector2Int.zero) > config.homeDistance)
+        if (spawnEnemy && Vector2Int.Distance(pos, Vector2Int.zero) > config.homeDistance)
         {
             if (frogs.Count < config.targetFrogs && Random.value <= config.frogChance)
             {
                 SpawnFrog(pos);
-            } else if (dragons.Count < config.targetDragons && Random.value <= config.dragonChance)
+                spawnTree = false;
+            }
+            else if (dragons.Count < config.targetDragons && Random.value <= config.dragonChance)
             {
                 SpawnDragon(pos);
+                spawnTree = false;
+            }
+        }
+        if (spawnTree) {
+            if (Random.value <= config.smallTreeChance)
+            {
+                SpawnTree(1, pos);
+            }
+            else if (Random.value <= config.mediumTreeChance)
+            {
+                SpawnTree(2, pos);
+            }
+            else if (Random.value <= config.tallTreeChance)
+            {
+                SpawnTree(3, pos);
             }
         }
     }
@@ -353,8 +377,10 @@ public class GameManager : MonoBehaviour
 
     protected void SpawnDragon(Vector2Int tilePos)
     {
+        GameObject go = Instantiate(dragonPrefab, new Vector3(tilePos.x * config.tileWidth, 0f, tilePos.y * config.tileWidth), Quaternion.identity);
+        go.transform.eulerAngles = new Vector3(0f, Random.Range(0f, 360f), 0f);
         dragons.Add(
-            Instantiate(dragonPrefab, new Vector3(tilePos.x * config.tileWidth, 0f, tilePos.y * config.tileWidth), Quaternion.identity).GetComponent<Dragon>()
+            go.GetComponent<Dragon>()
         );
     }
 
@@ -371,6 +397,23 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    protected void SpawnTree(int levels, Vector2Int pos)
+    {
+        float scale = Random.Range(0.75f, 1.5f);
+
+        Vector3 basePos = new Vector3(pos.x * config.tileWidth + Random.Range(-treeOffset, treeOffset), 0f, pos.y * config.tileWidth + Random.Range(-treeOffset, treeOffset));
+
+        for (int i = 0; i < levels; i++)
+        {
+            GameObject tree = treePrefabs[Random.Range(0, treePrefabs.Length - 1)];
+            GameObject treeInstance = Instantiate(tree, basePos + new Vector3(Random.Range(-0.1f, 0.1f), (i + 1) * 0.2f, Random.Range(-0.1f, 0.1f)), Quaternion.identity);
+
+            treeInstance.transform.localScale = new Vector3(scale, scale, scale);
+            treeInstance.transform.eulerAngles = new Vector3(0f, Random.Range(0f, 360f), 0f);
+
+            scale *= Random.Range(0.5f, 0.8f);
+        }
+    }
 
     public void MixGreen()
     {
