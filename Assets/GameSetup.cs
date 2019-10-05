@@ -14,4 +14,10 @@ public struct GameSetup
     public float playerDeccel;
     public float playerMinHeight;
     public float playerMaxHeight;
+    public float captureDistance;
+    public float despawnDistance;
+    public float targetFrogs;
+    public float frogChance;
+    public float targetDragons;
+    public float dragonChance;
 }
