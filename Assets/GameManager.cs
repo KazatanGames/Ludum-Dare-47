@@ -12,6 +12,8 @@ public class GameManager : MonoBehaviour
     protected GameObject player; public GameObject Player { get { return player; } }
     [SerializeField]
     protected Camera mainCamera;
+    [SerializeField]
+    protected GameObject cauldronIcon;
     [Header("Game Setup")]
     [SerializeField]
     protected GameSetup config;
@@ -25,6 +27,8 @@ public class GameManager : MonoBehaviour
     protected GameObject frogPrefab;
     [SerializeField]
     protected GameObject dragonPrefab;
+    [SerializeField]
+    protected GameObject shieldPrefab;
     [Header("UI")]
     [SerializeField]
     protected Text uiFrogs;
@@ -38,11 +42,16 @@ public class GameManager : MonoBehaviour
     Vector2Int playerTile;
     protected Inventory inv;
     protected bool bookOpen = false;
+    protected float greenPotionTime = 0f;
+    protected float redPotionTime = 0f;
+    protected int shieldLife = 0;
 
     protected Dictionary<Vector2Int, TileInstance> tiles;
 
     protected List<Frog> frogs;
     protected List<Dragon> dragons;
+
+    protected GameObject shield;
 
     void Awake()
     {
@@ -78,24 +87,43 @@ public class GameManager : MonoBehaviour
         frogs = new List<Frog>();
         dragons = new List<Dragon>();
         inv = new Inventory();
-        inv.frogs = 0;
-        inv.dragonScales = 0;
+        inv.frogs = 30;
+        inv.dragonScales = 30;
 
         Instantiate(homePrefab, Vector3.zero, Quaternion.identity);
+
+        shield = Instantiate(shieldPrefab, Vector3.zero, Quaternion.identity);
+        shield.SetActive(false);
+
+        cauldronIcon.SetActive(false);
 
         GenerateWorld();
     }
 
     private void Update()
     {
+        UpdatePotions();
         GetInputs();
         MovePlayer();
+        UpdateShield();
         UpdateUI();
     }
 
     private void LateUpdate()
     {
         MoveCamera();
+    }
+
+    protected void UpdatePotions()
+    {
+        if (greenPotionTime > 0f)
+        {
+            greenPotionTime -= Time.deltaTime;
+        }
+        if (greenPotionTime > 0f)
+        {
+            redPotionTime -= Time.deltaTime;
+        }
     }
 
     protected void GetInputs()
@@ -111,11 +139,13 @@ public class GameManager : MonoBehaviour
             playerSpeed = Vector2.Lerp(playerSpeed, Vector2.zero, Time.deltaTime * config.playerDeccel);
         } else
         {
+            float accel = greenPotionTime > 0 ? config.playerAccel * 5f : config.playerAccel;
+
             // increase the speed to the max
-            playerSpeed = Vector2.Lerp(playerSpeed, inputVector * config.playerMaxSpeed, Time.deltaTime * config.playerAccel);
+            playerSpeed = Vector2.Lerp(playerSpeed, inputVector * config.playerMaxSpeed, Time.deltaTime * accel);
 
             // also lerp the targetCamFov to max
-            targetCamFov = Mathf.Lerp(config.cameraMinFov, config.cameraMaxFov, playerSpeed.magnitude / config.playerMaxSpeed);
+            targetCamFov = Mathf.Lerp(config.cameraMinFov, config.cameraMaxFov, playerSpeed.magnitude * (greenPotionTime > 0 ? 2f : 1f) / config.playerMaxSpeed);
         }
 
 
@@ -141,14 +171,25 @@ public class GameManager : MonoBehaviour
             if (!bookOpen)
             {
                 uiBookAnimator.SetTrigger("OpenSpellBook");
-                Debug.Log("Open");
                 bookOpen = true;
             }
+
+            cauldronIcon.SetActive(false);
         } else if (bookOpen)
         {
             uiBookAnimator.SetTrigger("CloseSpellBook");
-            Debug.Log("Close");
             bookOpen = false;
+
+            cauldronIcon.SetActive(true);
+        }
+
+        if (cauldronIcon.activeSelf)
+        {
+            cauldronIcon.transform.position = new Vector3(player.transform.position.x, 0f, player.transform.position.z);
+            cauldronIcon.transform.LookAt(Vector3.zero);
+            cauldronIcon.transform.Translate(cauldronIcon.transform.forward * 0.75f, Space.World);
+            cauldronIcon.transform.eulerAngles = Vector3.zero;
+            cauldronIcon.transform.Translate(cauldronIcon.transform.up * player.transform.position.y);
         }
 
         Vector2Int newPlayerTile = new Vector2Int(Mathf.FloorToInt(player.transform.position.x / config.tileWidth), Mathf.FloorToInt(player.transform.position.z / config.tileWidth));
@@ -315,5 +356,36 @@ public class GameManager : MonoBehaviour
         dragons.Add(
             Instantiate(dragonPrefab, new Vector3(tilePos.x * config.tileWidth, 0f, tilePos.y * config.tileWidth), Quaternion.identity).GetComponent<Dragon>()
         );
+    }
+
+    protected void UpdateShield()
+    {
+        shield.transform.position = new Vector3(player.transform.position.x, player.transform.position.y + 0.2f, player.transform.position.z);
+
+        if (shieldLife > 0)
+        {
+            shield.SetActive(true);
+        } else
+        {
+            shield.SetActive(false);
+        }
+    }
+
+
+    public void MixGreen()
+    {
+        if (inv.frogs < 10) return;
+
+        inv.frogs -= 10;
+        greenPotionTime = config.greenPotionTime;
+    }
+
+    public void MixRed()
+    {
+        if (inv.dragonScales < 5) return;
+
+        inv.dragonScales -= 5;
+        redPotionTime = config.redPotionTime;
+        shieldLife = 3;
     }
 }
