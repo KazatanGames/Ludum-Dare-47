@@ -30,11 +30,14 @@ public class GameManager : MonoBehaviour
     protected Text uiFrogs;
     [SerializeField]
     protected Text uiDragonScales;
+    [SerializeField]
+    protected Animator uiBookAnimator;
 
     protected Vector2 playerSpeed;
     protected float camFov;
     Vector2Int playerTile;
     protected Inventory inv;
+    protected bool bookOpen = false;
 
     protected Dictionary<Vector2Int, TileInstance> tiles;
 
@@ -132,6 +135,21 @@ public class GameManager : MonoBehaviour
         pos.z += playerSpeed.y;
         pos.y = Mathf.Lerp(config.playerMinHeight, config.playerMaxHeight, playerSpeed.magnitude / config.playerMaxSpeed);
         player.transform.position = pos;
+
+        if (pos.magnitude <= config.cauldronDistance)
+        {
+            if (!bookOpen)
+            {
+                uiBookAnimator.SetTrigger("OpenSpellBook");
+                Debug.Log("Open");
+                bookOpen = true;
+            }
+        } else if (bookOpen)
+        {
+            uiBookAnimator.SetTrigger("CloseSpellBook");
+            Debug.Log("Close");
+            bookOpen = false;
+        }
 
         Vector2Int newPlayerTile = new Vector2Int(Mathf.FloorToInt(player.transform.position.x / config.tileWidth), Mathf.FloorToInt(player.transform.position.z / config.tileWidth));
         if (newPlayerTile != playerTile)
@@ -266,7 +284,7 @@ public class GameManager : MonoBehaviour
             NewTile(pos);
         }
 
-        if (spawn)
+        if (spawn && Vector2Int.Distance(pos, Vector2Int.zero) > config.homeDistance)
         {
             if (frogs.Count < config.targetFrogs && Random.value <= config.frogChance)
             {

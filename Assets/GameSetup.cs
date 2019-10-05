@@ -16,6 +16,8 @@ public struct GameSetup
     public float playerMaxHeight;
     public float captureDistance;
     public float despawnDistance;
+    public float homeDistance;
+    public float cauldronDistance;
     public float targetFrogs;
     public float frogChance;
     public float targetDragons;
