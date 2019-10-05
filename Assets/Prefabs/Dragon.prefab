@@ -327,7 +327,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   head: {fileID: 5834743968898132927}
   neck: {fileID: 5834743968656522354}
-  rotateSpeed: 180
-  breathTime: 0.25
-  firePerSecond: 20
-  firePrefab: {fileID: 0}
+  rotateSpeed: 360
+  lookDistance: 10
+  range: 3.5
+  breathTime: 1.5
+  recoveryTime: 1
+  firePerSecond: 50
+  firePrefab: {fileID: 493039734918909100, guid: 90f28e0d083570c41b83a40efc7869ca,
+    type: 3}

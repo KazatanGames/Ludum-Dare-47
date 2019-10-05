@@ -11,13 +11,27 @@ public class Dragon : MonoBehaviour
     [SerializeField]
     protected float rotateSpeed = 720f;
     [SerializeField]
-    protected float breathTime = 0.25f;
+    protected float lookDistance = 6.5f;
     [SerializeField]
-    protected float firePerSecond = 20f;
+    protected float range = 3.5f;
+    [SerializeField]
+    protected float breathTime = 1f;
+    [SerializeField]
+    protected float recoveryTime = 0.75f;
+    [SerializeField]
+    protected float firePerSecond = 50f;
     [SerializeField]
     protected GameObject firePrefab;
 
     protected float recovery = 0f;
+    protected float breathed = 0f;
+    protected float fireBank = 0f;
+    protected float fireRate = 1f;
+
+    private void Awake()
+    {
+        fireRate = 1f / firePerSecond;
+    }
 
     // Update is called once per frame
     void Update()
@@ -30,9 +44,35 @@ public class Dragon : MonoBehaviour
             recovery = 0f;
         }
 
-        if (recovery == 0)
+        float playerDist = Vector3.Distance(GameManager.INSTANCE.Player.transform.position, transform.position);
+
+        if (playerDist <= lookDistance)
         {
             TurnHead();
+        }
+
+        if (recovery == 0) {
+            if (playerDist <= range)
+            {
+                Fire();
+                breathed += Time.deltaTime;
+                if (breathed >= breathTime)
+                {
+                    recovery = recoveryTime;
+                    breathed = 0f;
+                }
+            }
+            else
+            {
+                if (breathed > 0f)
+                {
+                    breathed -= Time.deltaTime;
+                    if (breathed < 0f)
+                    {
+                        breathed = 0f;
+                    }
+                }
+            }
         }
     }
 
@@ -51,5 +91,18 @@ public class Dragon : MonoBehaviour
         }
         float maxDiff = rotateSpeed * Time.deltaTime;
         head.transform.eulerAngles = new Vector3(90f, oldY + Mathf.Clamp(diff, -maxDiff, maxDiff), 0f);
+    }
+
+    protected void Fire()
+    {
+        fireBank += Time.deltaTime;
+
+        while(fireBank >= fireRate)
+        {
+            fireBank -= fireRate;
+            DragonFire df = Instantiate(firePrefab, head.transform.position, Quaternion.identity).GetComponent<DragonFire>();
+            df.transform.eulerAngles = new Vector3(0f, head.transform.eulerAngles.y - 180f, 0f);
+            df.transform.Translate(df.transform.forward * (fireBank + 0.4f), Space.World);
+        }
     }
 }
