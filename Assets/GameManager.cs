@@ -14,12 +14,16 @@ public class GameManager : MonoBehaviour
     protected Camera mainCamera;
     [SerializeField]
     protected GameObject cauldronIcon;
+    [SerializeField]
+    protected GameObject arrowIcon;
     [Header("Game Setup")]
     [SerializeField]
     protected GameSetup config;
     [Header("Tiles")]
     [SerializeField]
     protected GameObject grassTilePrefab;
+    [SerializeField]
+    protected GameObject bushTilePrefab;
     [Header("Other Prefabs")]
     [SerializeField]
     protected GameObject homePrefab;
@@ -31,6 +35,8 @@ public class GameManager : MonoBehaviour
     protected GameObject shieldPrefab;
     [SerializeField]
     protected GameObject[] treePrefabs;
+    [SerializeField]
+    protected GameObject[] rockPrefabs;
     [Header("UI")]
     [SerializeField]
     protected Text uiFrogs;
@@ -122,6 +128,7 @@ public class GameManager : MonoBehaviour
         shield.SetActive(false);
 
         cauldronIcon.SetActive(false);
+        arrowIcon.SetActive(false);
 
         GenerateWorld();
     }
@@ -133,11 +140,10 @@ public class GameManager : MonoBehaviour
         if (dying) {
             dieTime -= Time.deltaTime;
             Player.transform.Rotate(Vector3.forward, 720f * Time.deltaTime);
-            //Player.transform.Rotate(Vector3.up, 720f * Time.deltaTime);
             if (dieTime <= 0f)
             {
                 dying = false;
-                Player.transform.position = Vector3.zero;
+                Player.transform.position = new Vector3(0f, 0f, 1f);
             }
         }
         MovePlayer();
@@ -212,7 +218,7 @@ public class GameManager : MonoBehaviour
         pos.y = Mathf.Lerp(config.playerMinHeight, config.playerMaxHeight, playerSpeed.magnitude / config.playerMaxSpeed);
         player.transform.position = pos;
 
-        if (pos.magnitude <= config.cauldronDistance)
+        if (pos.magnitude <= config.cauldronDistance && playerSpeed.magnitude <= config.cauldronSpeed)
         {
             if (!bookOpen)
             {
@@ -221,21 +227,30 @@ public class GameManager : MonoBehaviour
             }
 
             cauldronIcon.SetActive(false);
+            arrowIcon.SetActive(false);
         } else if (bookOpen)
         {
             uiBookAnimator.SetTrigger("CloseSpellBook");
             bookOpen = false;
 
             cauldronIcon.SetActive(true);
+            arrowIcon.SetActive(true);
         }
 
         if (cauldronIcon.activeSelf)
         {
             cauldronIcon.transform.position = new Vector3(player.transform.position.x, 0f, player.transform.position.z);
             cauldronIcon.transform.LookAt(Vector3.zero);
-            cauldronIcon.transform.Translate(cauldronIcon.transform.forward * 0.75f, Space.World);
+            cauldronIcon.transform.Translate(cauldronIcon.transform.forward * 0.55f, Space.World);
             cauldronIcon.transform.eulerAngles = Vector3.zero;
             cauldronIcon.transform.Translate(cauldronIcon.transform.up * player.transform.position.y);
+        }
+        if (arrowIcon.activeSelf)
+        {
+            arrowIcon.transform.position = new Vector3(player.transform.position.x, 0f, player.transform.position.z);
+            arrowIcon.transform.LookAt(Vector3.zero);
+            arrowIcon.transform.Translate(arrowIcon.transform.forward * 0.7f, Space.World);
+            arrowIcon.transform.Translate(arrowIcon.transform.up * player.transform.position.y);
         }
 
         Vector2Int newPlayerTile = new Vector2Int(Mathf.FloorToInt(player.transform.position.x / config.tileWidth), Mathf.FloorToInt(player.transform.position.z / config.tileWidth));
@@ -383,7 +398,7 @@ public class GameManager : MonoBehaviour
         uiDragonScales.text = inv.dragonScales.ToString();
     }
 
-    protected void CheckNewTile(int x, int y, bool spawnTree, bool spawnEnemy)
+    protected void CheckNewTile(int x, int y, bool spawnScenery, bool spawnEnemy)
     {
         Vector2Int pos = new Vector2Int(x, y);
         if (!tiles.ContainsKey(pos))
@@ -391,7 +406,7 @@ public class GameManager : MonoBehaviour
             NewTile(pos);
         } else
         {
-            spawnTree = false;
+            spawnScenery = false;
         }
 
         if (spawnEnemy && Vector2Int.Distance(pos, Vector2Int.zero) > config.homeDistance)
@@ -399,15 +414,15 @@ public class GameManager : MonoBehaviour
             if (frogs.Count < config.targetFrogs && Random.value <= config.frogChance)
             {
                 SpawnFrog(pos);
-                spawnTree = false;
+                spawnScenery = false;
             }
             else if (dragons.Count < config.targetDragons && Random.value <= config.dragonChance)
             {
                 SpawnDragon(pos);
-                spawnTree = false;
+                spawnScenery = false;
             }
         }
-        if (spawnTree) {
+        if (spawnScenery) {
             if (Random.value <= config.smallTreeChance)
             {
                 SpawnTree(1, pos);
@@ -420,13 +435,25 @@ public class GameManager : MonoBehaviour
             {
                 SpawnTree(3, pos);
             }
+            else if (Random.value <= config.smallRockChance)
+            {
+                SpawnRock(1, pos);
+            }
         }
     }
 
     protected void NewTile(Vector2Int pos)
     {
-        GameObject tilePrefab = Instantiate(grassTilePrefab, new Vector3(pos.x * config.tileWidth, 0f, pos.y * config.tileWidth), Quaternion.identity);
+        GameObject tilePrefab;
+        if (Random.value <= config.bushTileChance)
+        {
+            tilePrefab = Instantiate(bushTilePrefab, new Vector3(pos.x * config.tileWidth, 0f, pos.y * config.tileWidth), Quaternion.identity);
+        } else
+        {
+            tilePrefab = Instantiate(grassTilePrefab, new Vector3(pos.x * config.tileWidth, 0f, pos.y * config.tileWidth), Quaternion.identity);
+        }
         tilePrefab.transform.localScale = new Vector3(config.tileWidth, 1f, config.tileWidth);
+        tilePrefab.transform.eulerAngles = new Vector3(0f, 90f * Random.Range(0, 3), 0f);
         tiles.Add(pos, new TileInstance(pos, tilePrefab, new TileData()));
     }
 
@@ -462,6 +489,24 @@ public class GameManager : MonoBehaviour
         {
             GameObject tree = treePrefabs[Random.Range(0, treePrefabs.Length - 1)];
             GameObject treeInstance = Instantiate(tree, basePos + new Vector3(Random.Range(-0.1f, 0.1f), (i + 1) * 0.2f, Random.Range(-0.1f, 0.1f)), Quaternion.identity);
+
+            treeInstance.transform.localScale = new Vector3(scale, scale, scale);
+            treeInstance.transform.eulerAngles = new Vector3(0f, Random.Range(0f, 360f), 0f);
+
+            scale *= Random.Range(0.5f, 0.8f);
+        }
+    }
+
+    protected void SpawnRock(int levels, Vector2Int pos)
+    {
+        float scale = Random.Range(0.75f, 1.5f);
+
+        Vector3 basePos = new Vector3(pos.x * config.tileWidth + Random.Range(-treeOffset, treeOffset), 0f, pos.y * config.tileWidth + Random.Range(-treeOffset, treeOffset));
+
+        for (int i = 0; i < levels; i++)
+        {
+            GameObject rock = rockPrefabs[Random.Range(0, rockPrefabs.Length - 1)];
+            GameObject treeInstance = Instantiate(rock, basePos + new Vector3(Random.Range(-0.1f, 0.1f), (i + 1) * 0.05f, Random.Range(-0.1f, 0.1f)), Quaternion.identity);
 
             treeInstance.transform.localScale = new Vector3(scale, scale, scale);
             treeInstance.transform.eulerAngles = new Vector3(0f, Random.Range(0f, 360f), 0f);

@@ -7,6 +7,7 @@ public struct GameSetup
 {
     public int tileGenerationDistance;
     public float tileWidth;
+    public float bushTileChance;
     public float cameraMinFov;
     public float cameraMaxFov;
     public float playerMaxSpeed;
@@ -18,6 +19,7 @@ public struct GameSetup
     public float despawnDistance;
     public float homeDistance;
     public float cauldronDistance;
+    public float cauldronSpeed;
     public float targetFrogs;
     public float frogChance;
     public float targetDragons;
@@ -27,5 +29,6 @@ public struct GameSetup
     public float smallTreeChance;
     public float mediumTreeChance;
     public float tallTreeChance;
+    public float smallRockChance;
     public float greenMusicPitch;
 }
