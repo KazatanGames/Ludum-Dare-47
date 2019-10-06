@@ -560,6 +560,8 @@ MonoBehaviour:
   cauldronIcon: {fileID: 1935847757}
   arrowIcon: {fileID: 1435269075}
   playerTrail: {fileID: 1691293359}
+  playerFlying: {fileID: 544211255}
+  playerStanding: {fileID: 1423276798}
   config:
     tileGenerationDistance: 3
     tileWidth: 4
@@ -569,7 +571,7 @@ MonoBehaviour:
     playerMaxSpeed: 0.25
     playerAccel: 1
     playerDeccel: 8
-    playerMinHeight: 0.1
+    playerMinHeight: 0
     playerMaxHeight: 1
     captureDistance: 0.4
     despawnDistance: 40
@@ -1003,6 +1005,12 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 538284601}
   m_CullTransparentMesh: 0
+--- !u!1 &544211255 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4063307383983615532, guid: 41aec8fa66f561b4ca536c70c4353c0f,
+    type: 3}
+  m_PrefabInstance: {fileID: 4854519526555130718}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &585041172
 GameObject:
   m_ObjectHideFlags: 0
@@ -2281,6 +2289,12 @@ RectTransform:
   m_AnchoredPosition: {x: 22.4, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1423276798 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5803429387191252995, guid: 41aec8fa66f561b4ca536c70c4353c0f,
+    type: 3}
+  m_PrefabInstance: {fileID: 4854519526555130718}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1435269075
 GameObject:
   m_ObjectHideFlags: 0
@@ -2854,17 +2868,17 @@ PrefabInstance:
     - target: {fileID: 4854519526100087008, guid: 41aec8fa66f561b4ca536c70c4353c0f,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.937
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4854519526100087008, guid: 41aec8fa66f561b4ca536c70c4353c0f,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4854519526100087008, guid: 41aec8fa66f561b4ca536c70c4353c0f,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 4854519526100087008, guid: 41aec8fa66f561b4ca536c70c4353c0f,
         type: 3}
@@ -2905,6 +2919,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4854519526064964451, guid: 41aec8fa66f561b4ca536c70c4353c0f,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6259428586980793703, guid: 41aec8fa66f561b4ca536c70c4353c0f,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4287351353469837307, guid: 41aec8fa66f561b4ca536c70c4353c0f,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.18
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 41aec8fa66f561b4ca536c70c4353c0f, type: 3}

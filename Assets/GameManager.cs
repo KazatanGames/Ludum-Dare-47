@@ -18,6 +18,10 @@ public class GameManager : MonoBehaviour
     protected GameObject arrowIcon;
     [SerializeField]
     protected TrailRenderer playerTrail;
+    [SerializeField]
+    protected GameObject playerFlying;
+    [SerializeField]
+    protected GameObject playerStanding;
     [Header("Game Setup")]
     [SerializeField]
     protected GameSetup config;
@@ -81,6 +85,8 @@ public class GameManager : MonoBehaviour
     protected bool dying = false; public bool Alive { get { return !dying; } }
     protected float dieTime = 0f;
     protected AudioSource playerAudio;
+    protected float camOffset;
+    protected bool pFlying;
 
     protected Dictionary<Vector2Int, TileInstance> tiles;
 
@@ -128,6 +134,11 @@ public class GameManager : MonoBehaviour
         inv.frogs = 0;
         inv.dragonScales = 0;
         playerAudio = player.GetComponent<AudioSource>();
+        pFlying = false;
+        playerFlying.SetActive(false);
+        playerStanding.SetActive(true);
+
+        camOffset = 0f;
 
         home = Instantiate(homePrefab, Vector3.zero, Quaternion.identity).GetComponent<Home>();
 
@@ -150,7 +161,7 @@ public class GameManager : MonoBehaviour
             if (dieTime <= 0f)
             {
                 dying = false;
-                Player.transform.position = new Vector3(0f, 0f, 1f);
+                Player.transform.position = new Vector3(0f, 0f, -1f);
                 playerTrail.Clear();
             }
         }
@@ -231,13 +242,15 @@ public class GameManager : MonoBehaviour
 
     protected void MovePlayer()
     {
+        float psm = playerSpeed.magnitude;
+
         Vector3 pos = player.transform.position;
         pos.x += playerSpeed.x;
         pos.z += playerSpeed.y;
-        pos.y = Mathf.Lerp(config.playerMinHeight, config.playerMaxHeight, playerSpeed.magnitude / config.playerMaxSpeed);
+        pos.y = Mathf.Lerp(config.playerMinHeight, config.playerMaxHeight, psm / config.playerMaxSpeed);
         player.transform.position = pos;
 
-        if (pos.magnitude <= config.cauldronDistance && playerSpeed.magnitude <= config.cauldronSpeed)
+        if (pos.magnitude <= config.cauldronDistance && psm <= config.cauldronSpeed)
         {
             if (!bookOpen)
             {
@@ -350,11 +363,34 @@ public class GameManager : MonoBehaviour
             SfxClip(sfxDragonPickup);
         }
 
+        psm = playerSpeed.magnitude;
+
+        // standing or flying
+        if (!pFlying && (psm >= 0.05f || player.transform.position.y > 0.05f))
+        {
+            playerFlying.SetActive(true);
+            playerStanding.SetActive(false);
+            pFlying = true;
+        } else if (pFlying && (psm < 0.05f && player.transform.position.y <= 0.05f))
+        {
+            playerFlying.SetActive(false);
+            playerStanding.SetActive(true);
+            pFlying = false;
+        }
+
     }
 
     protected void MoveCamera()
     {
-        mainCamera.transform.position = new Vector3(player.transform.position.x, mainCamera.transform.position.y, player.transform.position.z - 0.5f);
+        if (bookOpen)
+        {
+            camOffset = Mathf.SmoothStep(camOffset, -1.32f, Time.deltaTime * 8f);
+        }
+        else
+        {
+            camOffset = Mathf.SmoothStep(camOffset, 0f, Time.deltaTime * 12f);
+        }
+        mainCamera.transform.position = new Vector3(player.transform.position.x + camOffset, mainCamera.transform.position.y, player.transform.position.z - 0.5f);
         mainCamera.fieldOfView = camFov;
     }
 
