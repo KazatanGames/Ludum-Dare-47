@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -22,6 +23,8 @@ public class GameManager : MonoBehaviour
     protected GameObject playerFlying;
     [SerializeField]
     protected GameObject playerStanding;
+    [SerializeField]
+    protected MusicManager musicManager;
     [Header("Game Setup")]
     [SerializeField]
     protected GameSetup config;
@@ -38,11 +41,15 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     protected GameObject dragonPrefab;
     [SerializeField]
+    protected GameObject heliPrefab;
+    [SerializeField]
     protected GameObject shieldPrefab;
     [SerializeField]
     protected GameObject[] treePrefabs;
     [SerializeField]
     protected GameObject[] rockPrefabs;
+    [SerializeField]
+    protected GameObject winShowerPrefab;
     [Header("UI")]
     [SerializeField]
     protected Text uiFrogs;
@@ -87,11 +94,14 @@ public class GameManager : MonoBehaviour
     protected AudioSource playerAudio;
     protected float camOffset;
     protected bool pFlying;
+    protected bool killedHeli;
+    protected float killedHeliTime;
 
     protected Dictionary<Vector2Int, TileInstance> tiles;
 
     protected List<Frog> frogs;
     protected List<Dragon> dragons;
+    protected Heli heli;
 
     protected GameObject shield;
     protected Home home;
@@ -132,11 +142,13 @@ public class GameManager : MonoBehaviour
         dragons = new List<Dragon>();
         inv = new Inventory();
         inv.frogs = 0;
-        inv.dragonScales = 0;
+        inv.dragonScales = 6;
         playerAudio = player.GetComponent<AudioSource>();
         pFlying = false;
         playerFlying.SetActive(false);
         playerStanding.SetActive(true);
+        killedHeli = false;
+        killedHeliTime = 0f;
 
         camOffset = 0f;
 
@@ -168,6 +180,15 @@ public class GameManager : MonoBehaviour
         MovePlayer();
         UpdateShield();
         UpdateUI();
+
+        if (killedHeli)
+        {
+            killedHeliTime -= Time.deltaTime;
+            if (killedHeliTime <= 0f)
+            {
+                SceneManager.LoadScene("MenuScene");
+            }
+        }
     }
 
     private void LateUpdate()
@@ -204,7 +225,7 @@ public class GameManager : MonoBehaviour
         Vector2 inputVector = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         inputVector.Normalize();
 
-        if (dying || inputVector.magnitude == 0)
+        if (dying || killedHeli || inputVector.magnitude == 0)
         {
             // slow the player to a stop
             playerSpeed = Vector2.Lerp(playerSpeed, Vector2.zero, Time.deltaTime * config.playerDeccel);
@@ -219,7 +240,7 @@ public class GameManager : MonoBehaviour
             targetCamFov = Mathf.Lerp(config.cameraMinFov, config.cameraMaxFov, playerSpeed.magnitude * (greenPotionTime > 0 ? 2f : 1f) / config.playerMaxSpeed);
         }
 
-        if (Alive)
+        if (Alive && !killedHeli)
         {
             Vector3 eulerAngles = player.transform.eulerAngles;
             eulerAngles.y = Mathf.Atan2(playerSpeed.x, playerSpeed.y) * (180 / Mathf.PI);
@@ -363,15 +384,34 @@ public class GameManager : MonoBehaviour
             SfxClip(sfxDragonPickup);
         }
 
+        if (heli != null)
+        {
+            float fd = Vector2.Distance(new Vector2(heli.transform.position.x, heli.transform.position.z), new Vector2(pos.x, pos.z));
+            if (fd < config.captureDistance && redPotionTime > 0f)
+            {
+                Destroy(heli.gameObject);
+                heli = null;
+                killedHeli = true;
+                killedHeliTime = 8f;
+                musicManager.Finish();
+                Instantiate(winShowerPrefab, new Vector3(player.transform.position.x, 0f, player.transform.position.z), Quaternion.identity);
+            }
+            else if (fd > config.despawnDistance)
+            {
+                Destroy(heli.gameObject);
+                heli = null;
+            }
+        }
+
         psm = playerSpeed.magnitude;
 
         // standing or flying
-        if (!pFlying && (psm >= 0.05f || player.transform.position.y > 0.05f))
+        if ((!pFlying && (psm >= 0.05f || player.transform.position.y > 0.05f)) || dying)
         {
             playerFlying.SetActive(true);
             playerStanding.SetActive(false);
             pFlying = true;
-        } else if (pFlying && (psm < 0.05f && player.transform.position.y <= 0.05f))
+        } else if (pFlying && Alive && (psm < 0.05f && player.transform.position.y <= 0.05f))
         {
             playerFlying.SetActive(false);
             playerStanding.SetActive(true);
@@ -479,6 +519,11 @@ public class GameManager : MonoBehaviour
                 SpawnDragon(pos);
                 spawnScenery = false;
             }
+            else if (heli == null && !killedHeli && Random.value <= config.heliChance)
+            {
+                SpawnHeli(pos);
+                spawnScenery = false;
+            }
         }
         if (spawnScenery) {
             if (Random.value <= config.smallTreeChance)
@@ -529,6 +574,12 @@ public class GameManager : MonoBehaviour
         dragons.Add(
             go.GetComponent<Dragon>()
         );
+    }
+
+    protected void SpawnHeli(Vector2Int tilePos)
+    {
+        heli = Instantiate(heliPrefab, new Vector3(tilePos.x * config.tileWidth, 0f, tilePos.y * config.tileWidth), Quaternion.identity).GetComponent<Heli>();
+        heli.transform.eulerAngles = new Vector3(0f, Random.Range(0f, 360f), 0f);
     }
 
     protected void UpdateShield()
@@ -588,7 +639,7 @@ public class GameManager : MonoBehaviour
             if (shieldLife)
             {
                 shieldLife = false;
-                redPotionTime = 0.5f;
+                redPotionTime = 1f;
             }
             SfxClip(sfxShieldDown);
             return;
