@@ -46,6 +46,10 @@ public class GameManager : MonoBehaviour
     protected Text uiDragonScales;
     [SerializeField]
     protected Animator uiBookAnimator;
+    [SerializeField]
+    protected RectTransform uiGreenPotion;
+    [SerializeField]
+    protected RectTransform uiRedPotion;
     [Header("Audio")]
     [SerializeField]
     protected AudioSource audioMusic;
@@ -121,8 +125,8 @@ public class GameManager : MonoBehaviour
         frogs = new List<Frog>();
         dragons = new List<Dragon>();
         inv = new Inventory();
-        inv.frogs = 30;
-        inv.dragonScales = 30;
+        inv.frogs = 0;
+        inv.dragonScales = 0;
         playerAudio = player.GetComponent<AudioSource>();
 
         home = Instantiate(homePrefab, Vector3.zero, Quaternion.identity).GetComponent<Home>();
@@ -167,6 +171,7 @@ public class GameManager : MonoBehaviour
             greenPotionTime -= Time.deltaTime;
             if (greenPotionTime <= 0f)
             {
+                greenPotionTime = 0f;
                 audioMusic.pitch = 1f;
             }
         }
@@ -175,6 +180,7 @@ public class GameManager : MonoBehaviour
             redPotionTime -= Time.deltaTime;
             if (redPotionTime <= 0f)
             {
+                redPotionTime = 0f;
                 shieldLife = false;
             }
         }
@@ -409,6 +415,9 @@ public class GameManager : MonoBehaviour
     {
         uiFrogs.text = inv.frogs.ToString();
         uiDragonScales.text = inv.dragonScales.ToString();
+
+        uiGreenPotion.sizeDelta = new Vector2(32f, 55f * (greenPotionTime / config.greenPotionTime));
+        uiRedPotion.sizeDelta = new Vector2(32f, 55f * (redPotionTime / config.redPotionTime));
     }
 
     protected void CheckNewTile(int x, int y, bool spawnScenery, bool spawnEnemy)
@@ -555,9 +564,9 @@ public class GameManager : MonoBehaviour
 
     public void MixGreen()
     {
-        if (inv.frogs < 10) return;
+        if (inv.frogs < 6) return;
 
-        inv.frogs -= 10;
+        inv.frogs -= 6;
         greenPotionTime = config.greenPotionTime;
         audioMusic.pitch = config.greenMusicPitch;
         SfxClip(sfxDrink);
@@ -566,9 +575,9 @@ public class GameManager : MonoBehaviour
 
     public void MixRed()
     {
-        if (inv.dragonScales < 5) return;
+        if (inv.dragonScales < 3) return;
 
-        inv.dragonScales -= 5;
+        inv.dragonScales -= 3;
         redPotionTime = config.redPotionTime;
         shieldLife = true;
         SfxClip(sfxDrink);
