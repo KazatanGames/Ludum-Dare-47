@@ -142,7 +142,7 @@ public class GameManager : MonoBehaviour
         dragons = new List<Dragon>();
         inv = new Inventory();
         inv.frogs = 0;
-        inv.dragonScales = 6;
+        inv.dragonScales = 0;
         playerAudio = player.GetComponent<AudioSource>();
         pFlying = false;
         playerFlying.SetActive(false);
@@ -187,6 +187,7 @@ public class GameManager : MonoBehaviour
             if (killedHeliTime <= 0f)
             {
                 SceneManager.LoadScene("MenuScene");
+                Destroy(gameObject);
             }
         }
     }

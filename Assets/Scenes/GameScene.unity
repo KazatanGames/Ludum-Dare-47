@@ -579,10 +579,10 @@ MonoBehaviour:
     homeDistance: 8
     cauldronDistance: 4
     cauldronSpeed: 0.035
-    targetFrogs: 12
-    frogChance: 0.05
+    targetFrogs: 15
+    frogChance: 0.08
     targetDragons: 2
-    dragonChance: 0.01
+    dragonChance: 0.02
     heliChance: 0.005
     greenPotionTime: 35
     redPotionTime: 90
@@ -1720,8 +1720,6 @@ GameObject:
   m_Component:
   - component: {fileID: 963194228}
   - component: {fileID: 963194227}
-  - component: {fileID: 963194229}
-  - component: {fileID: 963194230}
   - component: {fileID: 963194232}
   - component: {fileID: 963194226}
   m_Layer: 0
@@ -1805,38 +1803,6 @@ RectTransform:
   m_AnchoredPosition: {x: 1, y: 6}
   m_SizeDelta: {x: 100, y: 56.25}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &963194229
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 963194225}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd5378998db5ba9488d08a4e3b80821a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Width: 640
-  m_Height: 360
-  m_AutoAspect: 0
-  m_FramePerSecond: 15
-  m_Repeat: 0
-  m_Quality: 30
-  m_BufferSize: 10
-  WorkerPriority: 2
---- !u!114 &963194230
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 963194225}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 05c1b099fbe92e94c93b6906f04a9e81, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!82 &963194232
 AudioSource:
   m_ObjectHideFlags: 0
