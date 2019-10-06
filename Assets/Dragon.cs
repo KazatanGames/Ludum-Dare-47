@@ -9,6 +9,8 @@ public class Dragon : MonoBehaviour
     [SerializeField]
     protected GameObject neck;
     [SerializeField]
+    protected AudioSource audioBreath;
+    [SerializeField]
     protected float rotateSpeed = 720f;
     [SerializeField]
     protected float lookDistance = 6.5f;
@@ -36,6 +38,7 @@ public class Dragon : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        bool firing = false;
         if (recovery > 0)
         {
             recovery -= Time.deltaTime;
@@ -54,6 +57,7 @@ public class Dragon : MonoBehaviour
         if (recovery == 0) {
             if (playerDist <= range)
             {
+                firing = true;
                 Fire();
                 breathed += Time.deltaTime;
                 if (breathed >= breathTime)
@@ -73,6 +77,16 @@ public class Dragon : MonoBehaviour
                     }
                 }
             }
+        }
+        if (firing)
+        {
+            if (!audioBreath.isPlaying)
+            {
+                audioBreath.Play();
+            }
+        } else
+        {
+            audioBreath.Stop();
         }
     }
 

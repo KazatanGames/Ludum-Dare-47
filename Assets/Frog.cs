@@ -7,6 +7,8 @@ public class Frog : MonoBehaviour
     [SerializeField]
     protected GameObject body;
     [SerializeField]
+    protected AudioSource audioJump;
+    [SerializeField]
     protected float jumpSpeed = 5f;
     [SerializeField]
     protected float jumpTime = 0.25f;
@@ -57,6 +59,8 @@ public class Frog : MonoBehaviour
         transform.position += transform.up * jumpHeight;
 
         speed = jumpSpeed;
+
+        audioJump.Play();
 
         nextAction = jumpTime;
     }

@@ -41,7 +41,7 @@ public class DragonFire : MonoBehaviour
         Vector3 ppos = GameManager.INSTANCE.Player.transform.position;
         if (Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(ppos.x, ppos.z)) < scale)
         {
-            GameManager.INSTANCE.Player.transform.position = Vector3.zero;
+            GameManager.INSTANCE.Die();
         }
     }
 }

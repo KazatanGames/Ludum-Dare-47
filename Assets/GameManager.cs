@@ -38,6 +38,24 @@ public class GameManager : MonoBehaviour
     protected Text uiDragonScales;
     [SerializeField]
     protected Animator uiBookAnimator;
+    [Header("Audio")]
+    [SerializeField]
+    protected AudioSource audioMusic;
+    [SerializeField]
+    protected AudioSource audioSfx;
+    [Header("Audio Clips")]
+    [SerializeField]
+    protected AudioClip sfxFrogPickup;
+    [SerializeField]
+    protected AudioClip sfxDragonPickup;
+    [SerializeField]
+    protected AudioClip sfxDrink;
+    [SerializeField]
+    protected AudioClip sfxGood;
+    [SerializeField]
+    protected AudioClip sfxGood2;
+    [SerializeField]
+    protected AudioClip sfxShieldDown;
 
     protected Vector2 playerSpeed;
     protected float camFov;
@@ -46,8 +64,11 @@ public class GameManager : MonoBehaviour
     protected bool bookOpen = false;
     protected float greenPotionTime = 0f;
     protected float redPotionTime = 0f;
-    protected int shieldLife = 0;
+    protected bool shieldLife = false;
     protected float treeOffset = 1f;
+    protected bool dying = false; public bool Alive { get { return !dying; } }
+    protected float dieTime = 0f;
+    protected AudioSource playerAudio;
 
     protected Dictionary<Vector2Int, TileInstance> tiles;
 
@@ -93,6 +114,7 @@ public class GameManager : MonoBehaviour
         inv = new Inventory();
         inv.frogs = 30;
         inv.dragonScales = 30;
+        playerAudio = player.GetComponent<AudioSource>();
 
         Instantiate(homePrefab, Vector3.zero, Quaternion.identity);
 
@@ -108,6 +130,16 @@ public class GameManager : MonoBehaviour
     {
         UpdatePotions();
         GetInputs();
+        if (dying) {
+            dieTime -= Time.deltaTime;
+            Player.transform.Rotate(Vector3.forward, 720f * Time.deltaTime);
+            //Player.transform.Rotate(Vector3.up, 720f * Time.deltaTime);
+            if (dieTime <= 0f)
+            {
+                dying = false;
+                Player.transform.position = Vector3.zero;
+            }
+        }
         MovePlayer();
         UpdateShield();
         UpdateUI();
@@ -123,10 +155,18 @@ public class GameManager : MonoBehaviour
         if (greenPotionTime > 0f)
         {
             greenPotionTime -= Time.deltaTime;
+            if (greenPotionTime <= 0f)
+            {
+                audioMusic.pitch = 1f;
+            }
         }
-        if (greenPotionTime > 0f)
+        if (redPotionTime > 0f)
         {
             redPotionTime -= Time.deltaTime;
+            if (redPotionTime <= 0f)
+            {
+                shieldLife = false;
+            }
         }
     }
 
@@ -137,7 +177,7 @@ public class GameManager : MonoBehaviour
         Vector2 inputVector = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         inputVector.Normalize();
 
-        if (inputVector.magnitude == 0)
+        if (dying || inputVector.magnitude == 0)
         {
             // slow the player to a stop
             playerSpeed = Vector2.Lerp(playerSpeed, Vector2.zero, Time.deltaTime * config.playerDeccel);
@@ -152,10 +192,12 @@ public class GameManager : MonoBehaviour
             targetCamFov = Mathf.Lerp(config.cameraMinFov, config.cameraMaxFov, playerSpeed.magnitude * (greenPotionTime > 0 ? 2f : 1f) / config.playerMaxSpeed);
         }
 
-
-        Vector3 eulerAngles = player.transform.eulerAngles;
-        eulerAngles.y = Mathf.Atan2(playerSpeed.x, playerSpeed.y) * (180 / Mathf.PI);
-        player.transform.eulerAngles = eulerAngles;
+        if (Alive)
+        {
+            Vector3 eulerAngles = player.transform.eulerAngles;
+            eulerAngles.y = Mathf.Atan2(playerSpeed.x, playerSpeed.y) * (180 / Mathf.PI);
+            player.transform.eulerAngles = eulerAngles;
+        }
 
         // also lerp the camfov to 0
         camFov = Mathf.Lerp(camFov, targetCamFov, Time.deltaTime);
@@ -206,15 +248,19 @@ public class GameManager : MonoBehaviour
 
         List<Frog> deadFrogs = new List<Frog>();
         List<Frog> farFrogs = new List<Frog>();
-        foreach (Frog f in frogs)
+        if (Alive)
         {
-            float fd = Vector2.Distance(new Vector2(f.transform.position.x, f.transform.position.z), new Vector2(pos.x, pos.z));
-            if (fd < config.captureDistance)
+            foreach (Frog f in frogs)
             {
-                deadFrogs.Add(f);
-            } else if (fd > config.despawnDistance)
-            {
-                farFrogs.Add(f);
+                float fd = Vector2.Distance(new Vector2(f.transform.position.x, f.transform.position.z), new Vector2(pos.x, pos.z));
+                if (fd < config.captureDistance)
+                {
+                    deadFrogs.Add(f);
+                }
+                else if (fd > config.despawnDistance)
+                {
+                    farFrogs.Add(f);
+                }
             }
         }
         foreach(Frog f in deadFrogs)
@@ -229,18 +275,27 @@ public class GameManager : MonoBehaviour
             Destroy(f.gameObject);
         }
 
+        if (deadFrogs.Count > 0)
+        {
+            // play frog capture audio
+            SfxClip(sfxFrogPickup);
+        }
+
         List<Dragon> deadDragons = new List<Dragon>();
         List<Dragon> farDragons = new List<Dragon>();
-        foreach (Dragon d in dragons)
+        if (Alive)
         {
-            float fd = Vector2.Distance(new Vector2(d.transform.position.x, d.transform.position.z), new Vector2(pos.x, pos.z));
-            if (fd < config.captureDistance)
+            foreach (Dragon d in dragons)
             {
-                deadDragons.Add(d);
-            }
-            else if (fd > config.despawnDistance)
-            {
-                farDragons.Add(d);
+                float fd = Vector2.Distance(new Vector2(d.transform.position.x, d.transform.position.z), new Vector2(pos.x, pos.z));
+                if (fd < config.captureDistance)
+                {
+                    deadDragons.Add(d);
+                }
+                else if (fd > config.despawnDistance)
+                {
+                    farDragons.Add(d);
+                }
             }
         }
         foreach (Dragon d in deadDragons)
@@ -254,6 +309,13 @@ public class GameManager : MonoBehaviour
             dragons.Remove(d);
             Destroy(d.gameObject);
         }
+
+        if (deadDragons.Count > 0)
+        {
+            // play frog capture audio
+            SfxClip(sfxDragonPickup);
+        }
+
     }
 
     protected void MoveCamera()
@@ -387,14 +449,7 @@ public class GameManager : MonoBehaviour
     protected void UpdateShield()
     {
         shield.transform.position = new Vector3(player.transform.position.x, player.transform.position.y + 0.2f, player.transform.position.z);
-
-        if (shieldLife > 0)
-        {
-            shield.SetActive(true);
-        } else
-        {
-            shield.SetActive(false);
-        }
+        shield.SetActive(shieldLife);
     }
 
     protected void SpawnTree(int levels, Vector2Int pos)
@@ -415,12 +470,39 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    protected void SfxClip(AudioClip clip)
+    {
+        audioSfx.Stop();
+        audioSfx.clip = clip;
+        audioSfx.Play();
+    }
+
+    public void Die()
+    {
+        if (!Alive) return;
+        if (redPotionTime > 0f)
+        {
+            if (shieldLife)
+            {
+                shieldLife = false;
+                redPotionTime = 0.5f;
+            }
+            SfxClip(sfxShieldDown);
+            return;
+        }
+        dieTime = playerAudio.clip.length;
+        dying = true;
+        playerAudio.Play();
+    }
+
     public void MixGreen()
     {
         if (inv.frogs < 10) return;
 
         inv.frogs -= 10;
         greenPotionTime = config.greenPotionTime;
+        audioMusic.pitch = config.greenMusicPitch;
+        SfxClip(sfxDrink);
     }
 
     public void MixRed()
@@ -429,6 +511,7 @@ public class GameManager : MonoBehaviour
 
         inv.dragonScales -= 5;
         redPotionTime = config.redPotionTime;
-        shieldLife = 3;
+        shieldLife = true;
+        SfxClip(sfxDrink);
     }
 }

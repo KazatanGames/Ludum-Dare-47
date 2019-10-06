@@ -27,4 +27,5 @@ public struct GameSetup
     public float smallTreeChance;
     public float mediumTreeChance;
     public float tallTreeChance;
+    public float greenMusicPitch;
 }
