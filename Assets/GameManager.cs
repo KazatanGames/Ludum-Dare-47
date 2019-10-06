@@ -16,6 +16,8 @@ public class GameManager : MonoBehaviour
     protected GameObject cauldronIcon;
     [SerializeField]
     protected GameObject arrowIcon;
+    [SerializeField]
+    protected TrailRenderer playerTrail;
     [Header("Game Setup")]
     [SerializeField]
     protected GameSetup config;
@@ -82,6 +84,7 @@ public class GameManager : MonoBehaviour
     protected List<Dragon> dragons;
 
     protected GameObject shield;
+    protected Home home;
 
     void Awake()
     {
@@ -122,7 +125,7 @@ public class GameManager : MonoBehaviour
         inv.dragonScales = 30;
         playerAudio = player.GetComponent<AudioSource>();
 
-        Instantiate(homePrefab, Vector3.zero, Quaternion.identity);
+        home = Instantiate(homePrefab, Vector3.zero, Quaternion.identity).GetComponent<Home>();
 
         shield = Instantiate(shieldPrefab, Vector3.zero, Quaternion.identity);
         shield.SetActive(false);
@@ -139,11 +142,12 @@ public class GameManager : MonoBehaviour
         GetInputs();
         if (dying) {
             dieTime -= Time.deltaTime;
-            Player.transform.Rotate(Vector3.forward, 720f * Time.deltaTime);
+            Player.transform.Rotate(Vector3.up, 720f * Time.deltaTime);
             if (dieTime <= 0f)
             {
                 dying = false;
                 Player.transform.position = new Vector3(0f, 0f, 1f);
+                playerTrail.Clear();
             }
         }
         MovePlayer();
@@ -208,6 +212,15 @@ public class GameManager : MonoBehaviour
         // also lerp the camfov to 0
         camFov = Mathf.Lerp(camFov, targetCamFov, Time.deltaTime);
 
+        if (Alive && bookOpen && Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
+        {
+            MixGreen();
+        }
+
+        if (Alive && bookOpen && Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))
+        {
+            MixRed();
+        }
     }
 
     protected void MovePlayer()
@@ -341,10 +354,10 @@ public class GameManager : MonoBehaviour
 
     protected void GenerateWorld()
     {
-        int startX = playerTile.x - config.tileGenerationDistance;
-        int endX = playerTile.x + config.tileGenerationDistance + 1;
-        int startY = playerTile.y - config.tileGenerationDistance;
-        int endY = playerTile.y + config.tileGenerationDistance + 1;
+        int startX = playerTile.x - (config.tileGenerationDistance + 2);
+        int endX = playerTile.x + (config.tileGenerationDistance + 3);
+        int startY = playerTile.y - (config.tileGenerationDistance + 2);
+        int endY = playerTile.y + (config.tileGenerationDistance + 3);
 
         for (int xx = startX; xx < endX; xx++)
         {
@@ -548,6 +561,7 @@ public class GameManager : MonoBehaviour
         greenPotionTime = config.greenPotionTime;
         audioMusic.pitch = config.greenMusicPitch;
         SfxClip(sfxDrink);
+        home.greenBurst.Play();
     }
 
     public void MixRed()
@@ -558,5 +572,6 @@ public class GameManager : MonoBehaviour
         redPotionTime = config.redPotionTime;
         shieldLife = true;
         SfxClip(sfxDrink);
+        home.redBurst.Play();
     }
 }
