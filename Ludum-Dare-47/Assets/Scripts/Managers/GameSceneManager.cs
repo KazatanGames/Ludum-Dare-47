@@ -49,9 +49,9 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
     // managers
     protected InputManager inputManager;
 
-    public void TriggerPoint(TriggerData tData, ExtraTriggerData extras)
+    public void TriggerPoint(bool advanceLevel, TriggerData tData, ExtraTriggerData extras)
     {
-        if (tData.advanceLevel)
+        if (advanceLevel)
         {
             IncrementLevel();
         }

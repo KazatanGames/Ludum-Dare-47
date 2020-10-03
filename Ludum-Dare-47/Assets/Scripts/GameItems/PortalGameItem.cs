@@ -10,9 +10,9 @@ public class PortalGameItem : TriggeringGameItem
     [SerializeField]
     protected Renderer frontRenderer;
 
-    protected float frameDuration = 1f / 8;
+    protected float frameDuration = 1f / 16;
 
-    protected int framesInAnim = 3;
+    protected int framesInAnim = 4;
     protected int currentFrame = 0;
 
     protected float frameTime = 0f;

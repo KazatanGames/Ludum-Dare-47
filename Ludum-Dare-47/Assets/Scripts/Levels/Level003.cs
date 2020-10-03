@@ -23,29 +23,34 @@ public class Level003 : BaseLevel
         //AddTrigger(rightPortal, TriggerInteractionType.Portal_Player, TriggerData.rightPortalNormal);
         //AddTrigger(rightPortal, TriggerInteractionType.Portal_Inanimate, TriggerData.rightPortalNormal);
 
-        CreateTGI(
+        CreateSimpleLevelItem(
             LevelItemType.Crate,
             new Vector3(0, 0.5f, 0),
             Quaternion.identity,
             parent
         );
-        CreateTGI(
+        CreateSimpleLevelItem(
             LevelItemType.Crate,
             new Vector3(0.5f, 1.5f, 0),
             Quaternion.identity,
             parent
         );
-        CreateTGI(
+        CreateSimpleLevelItem(
             LevelItemType.Crate,
             new Vector3(1, 0.5f, 0),
             Quaternion.identity,
             parent
         );
-        CreateTGI(
+        CreateSimpleLevelItem(
             LevelItemType.Crate,
             new Vector3(2, 0.5f, 0),
             Quaternion.identity,
             parent
         );
+    }
+
+    protected override void TriggerActivated(TriggeringGameItem tgi, TriggerInteractionType type, ExtraTriggerData extras)
+    {
+        shouldAdvance = true;
     }
 }

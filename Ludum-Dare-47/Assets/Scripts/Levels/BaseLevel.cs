@@ -5,6 +5,8 @@ public abstract class BaseLevel
 {
     protected Dictionary<TriggeringGameItem, Dictionary<TriggerInteractionType, TriggerData>> triggers;
 
+    protected bool shouldAdvance = false;
+
     public BaseLevel()
     {
         triggers = new Dictionary<TriggeringGameItem, Dictionary<TriggerInteractionType, TriggerData>>(); ;
@@ -14,9 +16,11 @@ public abstract class BaseLevel
 
     public void Trigger(TriggeringGameItem tgi, TriggerInteractionType type, ExtraTriggerData extras)
     {
+        TriggerActivated(tgi, type, extras);
+
         if (triggers.ContainsKey(tgi) && triggers[tgi].ContainsKey(type))
         {
-            GameSceneManager.INSTANCE.TriggerPoint(triggers[tgi][type], extras);
+            GameSceneManager.INSTANCE.TriggerPoint(shouldAdvance, triggers[tgi][type], extras);
         }
     }
     public void Trigger(TriggeringGameItem tgi, TriggerInteractionType type)
@@ -41,6 +45,16 @@ public abstract class BaseLevel
         return tgi;
     }
 
+    protected GameObject CreateSimpleLevelItem(LevelItemType type, Vector3 position, Quaternion rotation, Transform parent)
+    {
+        return GameObject.Instantiate(
+            GameSceneManager.INSTANCE.GetPrefab(type),
+            position,
+            rotation,
+            parent
+        );
+    }
+
     protected void AddTrigger(TriggeringGameItem tgi, TriggerInteractionType type, TriggerData tData)
     {
         if (!triggers.ContainsKey(tgi))
@@ -56,4 +70,6 @@ public abstract class BaseLevel
             triggers[tgi].Add(type, tData);
         }
     }
+
+    protected abstract void TriggerActivated(TriggeringGameItem tgi, TriggerInteractionType type, ExtraTriggerData extras);
 }
