@@ -15,9 +15,10 @@ public class InputManager
     {
         totalInputs =  new InputStruct()
         {
-            startJump = totalInputs.startJump || Input.GetAxis("Jump") >= 0.25f,
+            hasVertical = totalInputs.hasVertical || Input.GetAxis("Jump") >= 0.25f,
             hasHorizontal = totalInputs.hasHorizontal || (Mathf.Abs(Input.GetAxis("Horizontal")) > 0.1f),
-            horizontal = totalInputs.horizontal + Input.GetAxis("Horizontal")
+            horizontal = totalInputs.horizontal + Input.GetAxis("Horizontal"),
+            vertical = totalInputs.vertical + Input.GetAxis("Jump")
         };
         inputsThisFrame++;
     }
@@ -26,9 +27,10 @@ public class InputManager
     {
         return new InputStruct()
         {
-            startJump = totalInputs.startJump,
+            hasVertical = totalInputs.hasVertical,
             hasHorizontal = totalInputs.hasHorizontal,
-            horizontal = totalInputs.horizontal / inputsThisFrame
+            horizontal = totalInputs.horizontal / inputsThisFrame,
+            vertical = totalInputs.vertical / inputsThisFrame
         };
     }
 
@@ -37,9 +39,10 @@ public class InputManager
         inputsThisFrame = 0;
         totalInputs = new InputStruct()
         {
-            startJump = false,
+            hasVertical = false,
             hasHorizontal = false,
-            horizontal = 0
+            horizontal = 0,
+            vertical = 0
         };
     }
 }

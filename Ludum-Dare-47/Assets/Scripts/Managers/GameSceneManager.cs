@@ -9,30 +9,66 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
     protected MoonGameItem moonGameItem;
     [Header("Game Setup")]
     [SerializeField]
-    protected float playerSpeed;
+    protected float playerMaxSpeed;
+    [SerializeField]
+    protected float playerAccel;
+    [SerializeField]
+    protected float jumpImpulse;
     [SerializeField]
     protected Vector3 initialPlayerPosition;
     [SerializeField]
     protected LevelItemPrefabMapSO prefabMap;
 
+    [Header("Testing")]
+    protected int startingLevel;
+
     // variables
-    protected int currentLevel = -1;
-    protected int maxLevel = 50;
-    protected BaseLevel currentLevelData = new Level001();
+    protected int currentLevel = 0;
     protected Transform levelContainer;
-    protected bool velocityFlip = false;
+    protected bool isJumping = false;
+
+    // levels
+    protected List<BaseLevel> levels = new List<BaseLevel>()
+    {
+        new Level001(),
+        new Level002(),
+        new Level003(),
+    };
+
+    protected Dictionary<Rigidbody, Vector3> positionChanges = new Dictionary<Rigidbody, Vector3>();
 
     // managers
     protected InputManager inputManager;
 
-    public void TriggerPoint(TriggerData tData)
+    public void TriggerPoint(TriggerData tData, ExtraTriggerData extras)
     {
         if (tData.advanceLevel)
         {
             IncrementLevel();
         }
 
-        playerRb.position += tData.playerPositionOffset;
+        if (tData.moveObject)
+        {
+            Vector3 dPos = tData.playerPositionOffset;
+
+            if (tData.playerPositionOffset.x > 0)
+            {
+                dPos -= new Vector3(extras.objectSize.x / 2f, 0, 0);
+            }
+            else if (tData.playerPositionOffset.x < 0)
+            {
+                dPos += new Vector3(extras.objectSize.x / 2f, 0, 0);
+            }
+
+            if (positionChanges.ContainsKey(extras.colliderLevelItem.attachedRigidbody))
+            {
+                positionChanges[extras.colliderLevelItem.attachedRigidbody] = dPos;
+            }
+            else
+            {
+                positionChanges.Add(extras.colliderLevelItem.attachedRigidbody, dPos);
+            }
+        }
     }
 
     public GameObject GetPrefab(LevelItemType type)
@@ -47,9 +83,13 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
     protected void IncrementLevel()
     {
         currentLevel++;
-        moonGameItem.SetPositionRatio((float)currentLevel / (float)maxLevel);
-
+        UpdateMoonPosition();
         DrawLevel();
+    }
+
+    protected void UpdateMoonPosition()
+    {
+        moonGameItem.SetPositionRatio((float)currentLevel / (float)levels.Count);
     }
 
     protected void DrawLevel()
@@ -59,15 +99,16 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
             Destroy(levelContainer.gameObject);
         }
         levelContainer = (new GameObject("Level Container")).transform;
-        currentLevelData.Create(levelContainer);
+        levels[currentLevel].Create(levelContainer);
     }
 
     protected override void Initialise()
     {
         inputManager = new InputManager();
-        //playerRb.position = new Vector3(-8f, 0.01f, 0);
-        moonGameItem.SetPositionRatio(currentLevel / maxLevel);
+        UpdateMoonPosition();
 
+        currentLevel = startingLevel;
+        UpdateMoonPosition();
         DrawLevel();
     }
 
@@ -81,10 +122,35 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
         InputStruct inputs = inputManager.GetInputs();
         Vector3 velocity = playerRb.velocity;
 
-        if (inputs.hasHorizontal) { 
-            velocity.x = playerSpeed * inputs.horizontal;
+        if (isJumping)
+        {
+            if (Mathf.Abs(playerRb.velocity.y) < 0.05f)
+            {
+                float distance = 0.25f;
+                if (Physics.Raycast(playerRb.position + new Vector3(0, 0.1f, 0), Vector3.down, out _, distance))
+                {
+                    isJumping = false;
+                }
+            }
+        }
+        
+        if (inputs.hasHorizontal) {
+            playerRb.AddForce(Vector3.right * inputs.horizontal * playerAccel, ForceMode.Acceleration);
+            velocity.x = Mathf.Clamp(velocity.x, -playerMaxSpeed, playerMaxSpeed);
             playerRb.velocity = velocity;
         }
+        if (inputs.hasVertical && !isJumping)
+        {
+            isJumping = true;
+            playerRb.AddForce(Vector3.up * jumpImpulse, ForceMode.Impulse);
+        }
+
         inputManager.ResetInputs();
+
+        foreach(KeyValuePair<Rigidbody, Vector3> keyValuePair in positionChanges)
+        {
+            keyValuePair.Key.position += keyValuePair.Value;
+        }
+        positionChanges.Clear();
     }
 }
