@@ -11,6 +11,8 @@ public class MoonGameItem : MonoBehaviour
     protected Vector3 endPosition;
     [SerializeField]
     protected PointAtZero moonLight;
+    [SerializeField]
+    protected GameObject quad;
 
     public void SetPositionRatio(float ratio)
     {
@@ -49,11 +51,14 @@ public class MoonGameItem : MonoBehaviour
         }
 
         moonLight.Point();
+        quad.transform.rotation = Quaternion.LookRotation(quad.transform.position - Camera.main.transform.position);
     }
 
     private void Awake()
     {
         transform.position = startPosition;
         moonLight.Point();
+
+        quad.transform.rotation = Quaternion.LookRotation(quad.transform.position - Camera.main.transform.position);
     }
 }

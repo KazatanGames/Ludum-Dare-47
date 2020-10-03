@@ -98,7 +98,7 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
 
     protected void UpdateMoonPosition()
     {
-        moonGameItem.SetPositionRatio((float)currentLevel / (float)levels.Count);
+        moonGameItem.SetPositionRatio((float)currentLevel / ((float)levels.Count - 1));
     }
 
     protected void DrawLevel()
