@@ -7,6 +7,10 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
     protected Rigidbody playerRb;
     [SerializeField]
     protected MoonGameItem moonGameItem;
+    [SerializeField]
+    protected PlayerGameItem playerGameItem;
+    [SerializeField]
+    protected Transform playerFrontRendererTransform;
     [Header("Game Setup")]
     [SerializeField]
     protected float playerMaxSpeed;
@@ -29,6 +33,8 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
 
     protected float horizontalInputSinceFixedUpdate = 0f;
     protected bool shouldJump = false;
+
+    protected float timeIdle = 0f;
 
     // levels
     protected List<BaseLevel> levels = new List<BaseLevel>()
@@ -117,8 +123,70 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
 
     protected void Update()
     {
+        bool input = (Input.GetAxis("Horizontal") + Input.GetAxis("Jump")) > 0.1f;
+
+        if (playerRb.velocity.sqrMagnitude < 0.05f && !input && !isJumping)
+        {
+            // player is idle
+            timeIdle += Time.deltaTime;
+        } else
+        {
+            timeIdle = 0f;
+        }
+
+        if (isJumping)
+        {
+            if (playerRb.velocity.y > 0)
+            {
+                playerFrontRendererTransform.localRotation = Quaternion.Euler(0f, 0f, playerGameItem.IsFlipped ? 25f : -25f);
+            } else
+            {
+                playerFrontRendererTransform.localRotation = Quaternion.Euler(0f, 0f, playerGameItem.IsFlipped ? -25f : 25f);
+            }
+        }
+
         horizontalInputSinceFixedUpdate += Input.GetAxis("Horizontal");
         if (Input.GetAxis("Jump") > 0.25f) shouldJump = true;
+
+        UpdatePlayerAnim();
+    }
+
+    protected void UpdatePlayerAnim()
+    {
+        if (timeIdle > 0)
+        {
+            if (!playerGameItem.IsIdle)
+            {
+                playerGameItem.ChangeAnim(PlayerAnimType.Idle_Side);
+            }
+            else if (playerGameItem.CurAnim == PlayerAnimType.Idle_Side && timeIdle > 2f)
+            {
+                playerGameItem.ChangeAnim(PlayerAnimType.Idle_Front);
+            }
+        } else
+        {
+            if (isJumping)
+            {
+                if (playerGameItem.CurAnim != PlayerAnimType.Jump)
+                {
+                    playerGameItem.ChangeAnim(PlayerAnimType.Jump);
+                }
+            } else
+            {
+                if (playerGameItem.CurAnim != PlayerAnimType.Walk)
+                {
+                    playerGameItem.ChangeAnim(PlayerAnimType.Walk);
+                }
+            }
+
+            if (horizontalInputSinceFixedUpdate > 0.05f)
+            {
+                playerGameItem.SetFlip(true);
+            } else if (horizontalInputSinceFixedUpdate < -0.05f)
+            {
+                playerGameItem.SetFlip(false);
+            }
+        }
     }
 
     protected void FixedUpdate()
@@ -128,10 +196,11 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
         {
             if (isJumping)
             {
-                float distance = 0.25f;
+                float distance = 0.4f;
                 if (Physics.Raycast(playerRb.position + new Vector3(0, 0.1f, 0), Vector3.down, out _, distance))
                 {
                     isJumping = false;
+                    playerFrontRendererTransform.localRotation = Quaternion.Euler(0f, 0f, 0f);
                 }
             }
         } else

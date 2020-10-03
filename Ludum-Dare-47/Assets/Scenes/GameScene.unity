@@ -183,7 +183,7 @@ CapsuleCollider:
   m_Material: {fileID: 13400000, guid: 092f9f5411f81514382763b3211106c9, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.2
+  m_Radius: 0.4
   m_Height: 1.2
   m_Direction: 1
   m_Center: {x: 0, y: 0.6, z: 0}
@@ -199,6 +199,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 266fd53a1914aba469b1a88267f1b7f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  framesPerSecond: 2
+  frontRenderer: {fileID: 1851604691}
+  leftRenderer: {fileID: 0}
+  rightRenderer: {fileID: 0}
 --- !u!1 &14206722
 GameObject:
   m_ObjectHideFlags: 0
@@ -669,6 +673,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerRb: {fileID: 10308756}
   moonGameItem: {fileID: 1420704758}
+  playerGameItem: {fileID: 10308758}
+  playerFrontRendererTransform: {fileID: 1851604689}
   playerMaxSpeed: 0.333
   playerAccel: 1
   jumpImpulse: 23
@@ -1002,7 +1008,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1404223189}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -20, y: 0, z: 20}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1167,8 +1173,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1851604688}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.6, z: -0.2}
-  m_LocalScale: {x: 0.4, y: 1.2, z: 1}
+  m_LocalPosition: {x: 0, y: 0.6, z: 0.2}
+  m_LocalScale: {x: 1.2, y: 1.2, z: 1}
   m_Children: []
   m_Father: {fileID: 10308755}
   m_RootOrder: 0
