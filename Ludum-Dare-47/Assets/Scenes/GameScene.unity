@@ -669,10 +669,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerRb: {fileID: 10308756}
   moonGameItem: {fileID: 1420704758}
-  playerMaxSpeed: 8
-  playerAccel: 5
-  jumpImpulse: 30
-  jumpInputTime: 0.000001
+  playerMaxSpeed: 0.333
+  playerAccel: 1
+  jumpImpulse: 23
   initialPlayerPosition: {x: 0, y: 0.01, z: 0}
   prefabMap: {fileID: 11400000, guid: ad8304540f5e32f42bef87653e8bc53a, type: 2}
 --- !u!4 &1070135917

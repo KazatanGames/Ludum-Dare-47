@@ -27,6 +27,9 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
     protected Transform levelContainer;
     protected bool isJumping = false;
 
+    protected float horizontalInputSinceFixedUpdate = 0f;
+    protected bool shouldJump = false;
+
     // levels
     protected List<BaseLevel> levels = new List<BaseLevel>()
     {
@@ -114,17 +117,16 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
 
     protected void Update()
     {
-        inputManager.UpdateInputs();
+        horizontalInputSinceFixedUpdate += Input.GetAxis("Horizontal");
+        if (Input.GetAxis("Jump") > 0.25f) shouldJump = true;
     }
 
     protected void FixedUpdate()
     {
-        InputStruct inputs = inputManager.GetInputs();
-        Vector3 velocity = playerRb.velocity;
-
-        if (isJumping)
+        // check for landing
+        if (Mathf.Abs(playerRb.velocity.y) < 0.1f)
         {
-            if (Mathf.Abs(playerRb.velocity.y) < 0.05f)
+            if (isJumping)
             {
                 float distance = 0.25f;
                 if (Physics.Raycast(playerRb.position + new Vector3(0, 0.1f, 0), Vector3.down, out _, distance))
@@ -132,21 +134,33 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
                     isJumping = false;
                 }
             }
+        } else
+        {
+            isJumping = true;
         }
-        
-        if (inputs.hasHorizontal) {
-            playerRb.AddForce(Vector3.right * inputs.horizontal * playerAccel, ForceMode.Acceleration);
-            velocity.x = Mathf.Clamp(velocity.x, -playerMaxSpeed, playerMaxSpeed);
-            playerRb.velocity = velocity;
+
+        // horizontal movement
+        if (horizontalInputSinceFixedUpdate != 0f)
+        {
+            playerRb.AddForce(Vector3.right * horizontalInputSinceFixedUpdate * playerAccel, ForceMode.VelocityChange);
         }
-        if (inputs.hasVertical && !isJumping)
+        // ensure max speed
+        Vector3 velocity = playerRb.velocity;
+        velocity.x = Mathf.Clamp(velocity.x, -playerMaxSpeed, playerMaxSpeed);
+        playerRb.velocity = velocity;
+
+        // vertical movement
+        if (shouldJump && !isJumping)
         {
             isJumping = true;
             playerRb.AddForce(Vector3.up * jumpImpulse, ForceMode.Impulse);
         }
 
-        inputManager.ResetInputs();
+        // reset inputs
+        horizontalInputSinceFixedUpdate = 0f;
+        shouldJump = false;
 
+        // position changes from triggered events
         foreach(KeyValuePair<Rigidbody, Vector3> keyValuePair in positionChanges)
         {
             keyValuePair.Key.position += keyValuePair.Value;
