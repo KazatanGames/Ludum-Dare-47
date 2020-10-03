@@ -145,7 +145,7 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
             }
         }
 
-        horizontalInputSinceFixedUpdate += Input.GetAxis("Horizontal");
+        horizontalInputSinceFixedUpdate = Input.GetAxis("Horizontal");
         if (Input.GetAxis("Jump") > 0.25f) shouldJump = true;
 
         UpdatePlayerAnim();

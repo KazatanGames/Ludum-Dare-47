@@ -7,7 +7,7 @@ public class Level002 : BaseLevel
     {
         TriggeringGameItem leftPortal = CreateTGI(
             LevelItemType.Portal,
-            new Vector3(-10, 0, 0),
+            new Vector3(-7, 0, 0),
             Quaternion.identity,
             parent
         );
@@ -16,7 +16,7 @@ public class Level002 : BaseLevel
 
         TriggeringGameItem rightPortal = CreateTGI(
             LevelItemType.Portal,
-            new Vector3(10, 0, 0),
+            new Vector3(7, 0, 0),
             Quaternion.AngleAxis(180, Vector3.up),
             parent
         );

@@ -17,7 +17,7 @@ public class PlayerGameItem : MonoBehaviour
 
     protected AnimInfoStruct idleFront = new AnimInfoStruct() { framesInAnim = 2, startFrame = 0, fps = 2 };
     protected AnimInfoStruct idleSide = new AnimInfoStruct() { framesInAnim = 2, startFrame = 2, fps = 3 };
-    protected AnimInfoStruct walk = new AnimInfoStruct() { framesInAnim = 2, startFrame = 4, fps = 4 };
+    protected AnimInfoStruct walk = new AnimInfoStruct() { framesInAnim = 2, startFrame = 4, fps = 5 };
     protected AnimInfoStruct jumping = new AnimInfoStruct() { framesInAnim = 1, startFrame = 6, fps = 1 };
 
     protected float textOffset = 0f;
