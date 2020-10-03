@@ -14,8 +14,6 @@ using System.Collections.Generic;
 public class AppManager : SingletonMonoBehaviour<AppManager>
 {
     [SerializeField]
-    protected Utilities.SceneField initialScene;
-    [SerializeField]
     protected List<GameObject> prefabsToCreate;
     [SerializeField]
     protected List<GameObject> introElements;
@@ -52,6 +50,7 @@ public class AppManager : SingletonMonoBehaviour<AppManager>
 
     protected bool IntrosComplete {
         get {
+            if (config.skipIntros) return true;
             foreach(GameObject go in introElements)
             {
                 IIntroElement iie = go.GetComponent<IIntroElement>();
@@ -73,7 +72,7 @@ public class AppManager : SingletonMonoBehaviour<AppManager>
             }
 
             // 4. Switch to initial scene
-            SceneManager.LoadScene(initialScene, LoadSceneMode.Single);
+            SceneManager.LoadScene(config.initialScene, LoadSceneMode.Single);
         }
     }
 }

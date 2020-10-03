@@ -96,6 +96,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -234,8 +235,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   initialScene:
-    sceneAsset: {fileID: 102900000, guid: 8610d53b3677e0a45adbd02e70302338, type: 3}
-    sceneName: Scenes/TitleScene
+    sceneAsset: {fileID: 102900000, guid: 5edf2552a37b0ad479f4e829d8bb52be, type: 3}
+    sceneName: Scenes/GameScene
   prefabsToCreate:
   - {fileID: 3495468913755574935, guid: 212116bd03ab5994c87088fbe2751aec, type: 3}
   - {fileID: 1871891793699075877, guid: 95f1b1153de0de442b7b1354f6435216, type: 3}
@@ -243,6 +244,7 @@ MonoBehaviour:
   - {fileID: 3495468913755574935, guid: 59700d8c47abbb6449e74adfca2a768c, type: 3}
   introElements:
   - {fileID: 1659948212}
+  config: {fileID: 11400000, guid: 8f8b42e5ccab8474a8a738485dfaccff, type: 2}
 --- !u!4 &1191193340
 Transform:
   m_ObjectHideFlags: 0
