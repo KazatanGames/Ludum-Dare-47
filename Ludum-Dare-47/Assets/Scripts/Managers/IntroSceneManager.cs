@@ -116,6 +116,7 @@ public class IntroSceneManager : MonoBehaviour
         if (titleAnimTime < titleAnimDuration + titleAnimDelay)
         {
             titleAnimTime += Time.deltaTime;
+            titleAnimTime = Mathf.Clamp(titleAnimTime, 0, titleAnimDuration + titleAnimDelay);
             if (titleAnimTime - titleAnimDelay >= 0)
             {
                 titleGameObject.transform.position = new Vector3(

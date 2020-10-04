@@ -42,8 +42,7 @@ public class MoonGameItem : MonoBehaviour
         if (ratioTime >= 1) return;
 
         ratioTime += Time.deltaTime;
-        currentRatio = Mathf.Lerp(oldRatio, targetRatio, Mathf.Clamp(ratioTime, 0, 1));
-
+        currentRatio = Mathf.Lerp(oldRatio, targetRatio, Mathf.Clamp(Easing.Quintic.InOut(ratioTime), 0, 1));
 
         if (currentRatio <= 0)
         {
@@ -59,7 +58,7 @@ public class MoonGameItem : MonoBehaviour
         }
         else if (currentRatio < 0.5f)
         {
-            float ratio = Easing.Quintic.InOut(Mathf.InverseLerp(0, 0.5f, currentRatio));
+            float ratio = Mathf.InverseLerp(0, 0.5f, currentRatio);
             float dx = midPosition.x - startPosition.x; //-3
             float dy = midPosition.y - startPosition.y; // 1
             transform.position = new Vector3(
@@ -70,7 +69,7 @@ public class MoonGameItem : MonoBehaviour
         }
         else
         {
-            float ratio = Easing.Quintic.InOut(Mathf.InverseLerp(0.5f, 1f, currentRatio));
+            float ratio = Mathf.InverseLerp(0.5f, 1f, currentRatio);
             float dx = endPosition.x - midPosition.x;
             float dy = endPosition.y - midPosition.y;
             transform.position = new Vector3(

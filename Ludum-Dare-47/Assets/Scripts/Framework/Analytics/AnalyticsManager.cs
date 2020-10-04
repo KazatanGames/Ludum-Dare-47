@@ -14,9 +14,9 @@ public class AnalyticsManager : SingletonMonoBehaviour<AnalyticsManager>
     public void SetEnabled(bool enabled)
     {
         AnalyticsEnabled = enabled;
-        AnalyticsEvent.debugMode = Debug.isDebugBuild;
+        //AnalyticsEvent.debugMode = Debug.isDebugBuild;
         PerformanceReporting.enabled = AnalyticsEnabled;
-        Analytics.enabled = AnalyticsEnabled;
+        //Analytics.enabled = AnalyticsEnabled;
     }
 
     protected override void Initialise()

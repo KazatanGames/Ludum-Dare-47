@@ -36,12 +36,26 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
 
     protected float timeIdle = 0f;
 
+    [Header("End Titles")]
+    [SerializeField]
+    protected GameObject titleGameObject;
+    protected bool finished = false;
+    [SerializeField]
+    protected float titleStartY;
+    [SerializeField]
+    protected float titleEndY;
+    [SerializeField]
+    protected float titleAnimDuration;
+
+    protected float titleAnimTime = 0f;
+
     // levels
     protected List<BaseLevel> levels = new List<BaseLevel>()
     {
         new Level001(),
         new Level002(),
         new Level003(),
+        new LevelEnd(),
     };
 
     protected Dictionary<Rigidbody, Vector3> positionChanges = new Dictionary<Rigidbody, Vector3>();
@@ -56,7 +70,7 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
             IncrementLevel();
         }
 
-        if (tData.moveObject)
+        if (tData.moveObject && extras.colliderLevelItem.attachedRigidbody != null)
         {
             Vector3 dPos = tData.playerPositionOffset;
 
@@ -92,6 +106,13 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
     protected void IncrementLevel()
     {
         currentLevel++;
+
+        if (currentLevel == levels.Count - 1)
+        {
+            finished = true;
+            titleGameObject.SetActive(true);
+        }
+        
         UpdateMoonPosition();
         DrawLevel();
     }
@@ -108,6 +129,7 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
             Destroy(levelContainer.gameObject);
         }
         levelContainer = (new GameObject("Level Container")).transform;
+
         levels[currentLevel].Create(levelContainer);
     }
 
@@ -153,6 +175,17 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
         if (Input.GetAxis("Jump") > 0.25f) shouldJump = true;
 
         UpdatePlayerAnim();
+
+        if (finished && titleAnimTime < titleAnimDuration)
+        {
+            titleAnimTime += Time.deltaTime;
+            titleAnimTime = Mathf.Clamp(titleAnimTime, 0, titleAnimDuration);
+            titleGameObject.transform.position = new Vector3(
+                0,
+                Mathf.Lerp(titleStartY, titleEndY, Easing.Cubic.Out(titleAnimTime / titleAnimDuration)),
+                0
+            );
+        }
     }
 
     protected void UpdatePlayerAnim()

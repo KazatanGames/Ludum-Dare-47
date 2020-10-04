@@ -41,13 +41,13 @@ public abstract class UIPanel : UIElement
         PanelShowing = true;
         CurrentPanel = this;
 
-        if (ScreenNameForAnalytics != ScreenName.None)
-        {
-            AnalyticsEvent.ScreenVisit(ScreenNameForAnalytics);
-        } else if (ScreenStringForAnalytics != "")
-        {
-            AnalyticsEvent.ScreenVisit(ScreenStringForAnalytics);
-        }
+        //if (ScreenNameForAnalytics != ScreenName.None)
+        //{
+        //    AnalyticsEvent.ScreenVisit(ScreenNameForAnalytics);
+        //} else if (ScreenStringForAnalytics != "")
+        //{
+        //    AnalyticsEvent.ScreenVisit(ScreenStringForAnalytics);
+        //}
 
         SfxPlayUIPanelIn();
     }
@@ -77,7 +77,7 @@ public abstract class UIPanel : UIElement
     protected abstract bool ShowingAtStart { get; }
 
     // Note, ScreenName is from Unity Analytics. This must be installed for this to not throw a reference error.
-    protected abstract ScreenName ScreenNameForAnalytics { get; }
+    //protected abstract ScreenName ScreenNameForAnalytics { get; }
 
     protected virtual string ScreenStringForAnalytics { get { return ""; } }
 

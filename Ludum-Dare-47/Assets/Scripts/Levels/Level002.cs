@@ -30,8 +30,8 @@ public class Level002 : BaseLevel
 
         crate = CreateSimpleLevelItem(
             LevelItemType.Crate,
-            new Vector3(0, 0.5f, 0),
-            Quaternion.identity,
+            new Vector3(0, 10f, 0),
+            Quaternion.AngleAxis(Random.Range(0f, 360f), Vector3.forward),
             parent
         );
     }
@@ -47,6 +47,7 @@ public class Level002 : BaseLevel
             if (tgi == rightPortal && type == TriggerInteractionType.Portal_Inanimate && extras.colliderLevelItem.gameObject == crate)
             {
                 crateRight = true;
+                crate.SetActive(false);
                 GameObject.Destroy(crate);
             }
         }
