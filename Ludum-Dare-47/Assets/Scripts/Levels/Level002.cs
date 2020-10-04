@@ -48,6 +48,7 @@ public class Level002 : BaseLevel
             if (tgi == rightPortal && type == TriggerInteractionType.Portal_Inanimate && extras.colliderLevelItem.gameObject == crate)
             {
                 crateRight = true;
+                ParticlesManager.INSTANCE.DestroyCrateParticles(crate.transform.position);
                 crate.SetActive(false);
                 GameObject.Destroy(crate);
             }

@@ -54,11 +54,13 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
     // levels
     protected List<BaseLevel> levels = new List<BaseLevel>()
     {
-        new Level005(),
         new Level001(),
         new Level002(),
         new Level003(),
         new Level004(),
+        new Level005(),
+        new Level006(),
+        new Level007(),
         new LevelEnd(),
     };
 

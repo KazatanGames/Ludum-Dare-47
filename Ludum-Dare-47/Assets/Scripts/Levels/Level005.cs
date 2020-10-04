@@ -9,6 +9,9 @@ public class Level005 : BaseLevel
     TriggeringGameItem rightPortal;
     GameObject ball;
 
+    PlateGameItem plate;
+    PlateGameItem plate2;
+
     Transform savedParent;
 
     public override void Create(Transform parent)
@@ -17,53 +20,67 @@ public class Level005 : BaseLevel
 
         CreateSimpleLevelItem(
             LevelItemType.MediumPlatform,
-            new Vector3(-7f, 1.5f, 0),
+            new Vector3(7f, 1.5f, 0),
             Quaternion.identity,
             parent
         );
 
         leftPortal = CreateTGI(
             LevelItemType.Portal,
-            new Vector3(-7f, 3, 0),
+            new Vector3(-7f, 0, 0),
             Quaternion.identity,
             parent
         );
-        TriggerData td = new TriggerData() { playerPositionOffset = new Vector3(13.1f, -3f, 0f), moveObject = true };
+        TriggerData td = new TriggerData() { playerPositionOffset = new Vector3(13.1f, 3f, 0f), moveObject = true };
         AddTrigger(leftPortal, TriggerInteractionType.Portal_Player, td);
         AddTrigger(leftPortal, TriggerInteractionType.Portal_Inanimate, td);
 
         rightPortal = CreateTGI(
             LevelItemType.Portal,
-            new Vector3(7f, 0, 0),
+            new Vector3(7f, 3f, 0),
             Quaternion.AngleAxis(180, Vector3.up),
             parent
         );
-        td = new TriggerData() { playerPositionOffset = new Vector3(-13.1f, 3f, 0f), moveObject = true };
+        td = new TriggerData() { playerPositionOffset = new Vector3(-13.1f, -3f, 0f), moveObject = true };
         AddTrigger(rightPortal, TriggerInteractionType.Portal_Player, td);
         AddTrigger(rightPortal, TriggerInteractionType.Portal_Inanimate, td);
 
-        ball = CreateSimpleLevelItem(
-            LevelItemType.Ball,
-            new Vector3(-4.8f, 3.5f, 0),
+        Collider crate = CreateSimpleLevelItem(
+            LevelItemType.Crate,
+            new Vector3(2f, 8f, 0),
             Quaternion.AngleAxis(Random.Range(0f, 360f), Vector3.forward),
             parent
-        );
+        ).GetComponent<Collider>();
+        Collider crate2 = CreateSimpleLevelItem(
+            LevelItemType.Crate,
+            new Vector3(5f, 8f, 0),
+            Quaternion.AngleAxis(Random.Range(0f, 360f), Vector3.forward),
+            parent
+        ).GetComponent<Collider>();
+
+        plate = CreateSimpleLevelItem(
+            LevelItemType.Plate,
+            new Vector3(-2.2f, 0f, 0),
+            Quaternion.identity,
+            parent
+        ).GetComponent<PlateGameItem>();
+
+        plate2 = CreateSimpleLevelItem(
+            LevelItemType.Plate,
+            new Vector3(0f, 0f, 0),
+            Quaternion.identity,
+            parent
+        ).GetComponent<PlateGameItem>();
+
+        plate.SetGoodColliders(new List<Collider>() { crate, crate2 });
+        plate2.SetGoodColliders(new List<Collider>() { crate, crate2 });
     }
 
     protected override void TriggerActivated(TriggeringGameItem tgi, TriggerInteractionType type, ExtraTriggerData extras)
     {
-        if (ballLeft)
+        if (plate.IsPlateGood && plate2.IsPlateGood)
         {
             if (tgi == rightPortal && type == TriggerInteractionType.Portal_Player) shouldAdvance = true;
-        }
-        else
-        {
-            if (tgi == leftPortal && type == TriggerInteractionType.Portal_Inanimate && extras.colliderLevelItem.gameObject == ball)
-            {
-                ballLeft = true;
-                ball.SetActive(false);
-                GameObject.Destroy(ball);
-            }
         }
     }
 }

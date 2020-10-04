@@ -3,5 +3,6 @@
     Portal,
     Crate,
     MediumPlatform,
-    Ball
+    Ball,
+    Plate,
 }
