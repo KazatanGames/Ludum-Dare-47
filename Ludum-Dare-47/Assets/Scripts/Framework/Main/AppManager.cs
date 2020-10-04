@@ -74,5 +74,10 @@ public class AppManager : SingletonMonoBehaviour<AppManager>
             // 4. Switch to initial scene
             SceneManager.LoadScene(config.initialScene, LoadSceneMode.Single);
         }
+
+        if (SystemInfo.deviceType == DeviceType.Desktop && (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.F4)))
+        {
+            Application.Quit();
+        }
     }
 }
