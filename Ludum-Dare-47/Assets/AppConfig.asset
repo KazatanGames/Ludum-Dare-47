@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: AppConfig
   m_EditorClassIdentifier: 
   initialScene:
-    sceneAsset: {fileID: 102900000, guid: 5edf2552a37b0ad479f4e829d8bb52be, type: 3}
-    sceneName: Scenes/GameScene
+    sceneAsset: {fileID: 102900000, guid: 8610d53b3677e0a45adbd02e70302338, type: 3}
+    sceneName: Scenes/TitleScene
   debugMode: 0
   skipIntros: 1

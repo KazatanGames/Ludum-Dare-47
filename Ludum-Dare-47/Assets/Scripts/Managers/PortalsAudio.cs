@@ -9,4 +9,9 @@ public class PortalsAudio : SingletonMonoBehaviour<PortalsAudio>
     public AudioSource right;
     [SerializeField]
     public AudioSource center;
+
+    [SerializeField]
+    public AudioSource left2;
+    [SerializeField]
+    public AudioSource right2;
 }

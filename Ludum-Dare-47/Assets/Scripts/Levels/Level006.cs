@@ -73,6 +73,7 @@ public class Level006 : BaseLevel
                 ParticlesManager.INSTANCE.DestroyCrateParticles(ball.transform.position);
                 ball.SetActive(false);
                 GameObject.Destroy(ball);
+                PortalsAudio.INSTANCE.left2.Play();
             }
         }
         else if (plate.IsPlateGood)
@@ -83,6 +84,7 @@ public class Level006 : BaseLevel
                 ParticlesManager.INSTANCE.DestroyCrateParticles(crate.transform.position);
                 crate.SetActive(false);
                 GameObject.Destroy(crate);
+                PortalsAudio.INSTANCE.right2.Play();
             }
         }
     }

@@ -56,6 +56,7 @@ public class Level003 : BaseLevel
                 ParticlesManager.INSTANCE.DestroyCrateParticles(crate.transform.position);
                 crate.SetActive(false);
                 GameObject.Destroy(crate);
+                PortalsAudio.INSTANCE.right2.Play();
             }
         }
         else
@@ -72,6 +73,7 @@ public class Level003 : BaseLevel
                     Quaternion.AngleAxis(Random.Range(0f, 360f), Vector3.forward),
                     savedParent
                 );
+                PortalsAudio.INSTANCE.left2.Play();
             }
         }
     }

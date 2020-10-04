@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class Level006 : BaseLevel
+public class Level007 : BaseLevel
 {
     protected bool crateRight = false;
     protected bool ballLeft = false;

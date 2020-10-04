@@ -60,7 +60,6 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
         new Level004(),
         new Level005(),
         new Level006(),
-        new Level007(),
         new LevelEnd(),
     };
 

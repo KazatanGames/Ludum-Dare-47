@@ -49,6 +49,7 @@ public class Level002 : BaseLevel
             {
                 crateRight = true;
                 ParticlesManager.INSTANCE.DestroyCrateParticles(crate.transform.position);
+                PortalsAudio.INSTANCE.right2.Play();
                 crate.SetActive(false);
                 GameObject.Destroy(crate);
             }

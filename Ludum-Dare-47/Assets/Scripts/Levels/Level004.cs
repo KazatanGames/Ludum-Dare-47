@@ -64,6 +64,7 @@ public class Level004 : BaseLevel
                 ParticlesManager.INSTANCE.DestroyCrateParticles(ball.transform.position);
                 ball.SetActive(false);
                 GameObject.Destroy(ball);
+                PortalsAudio.INSTANCE.left2.Play();
             }
         }
     }
