@@ -9,6 +9,10 @@ public class PlayerGameItem : MonoBehaviour
     protected Renderer leftRenderer;
     [SerializeField]
     protected Renderer rightRenderer;
+    [SerializeField]
+    protected AudioSource audioSource;
+    [SerializeField]
+    protected List<AudioClip> jumpAudioClips;
 
     public PlayerAnimType CurAnim { get; protected set; }
 
@@ -58,6 +62,12 @@ public class PlayerGameItem : MonoBehaviour
         currentFrame = 0;
 
         DrawFrame();
+    }
+
+    public void PlayAudioJump()
+    {
+        audioSource.clip = jumpAudioClips[Random.Range(0, jumpAudioClips.Count)];
+        audioSource.Play();
     }
 
     public bool IsIdle => CurAnim == PlayerAnimType.Idle_Front || CurAnim == PlayerAnimType.Idle_Side;

@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 public class PortalGameItem : TriggeringGameItem
 {
@@ -9,6 +9,8 @@ public class PortalGameItem : TriggeringGameItem
     protected float moveDistance = 0.15f;
     [SerializeField]
     protected Renderer frontRenderer;
+    [SerializeField]
+    protected List<AudioClip> zapNoises;
 
     protected float frameDuration = 1f / 16;
 
@@ -22,16 +24,38 @@ public class PortalGameItem : TriggeringGameItem
 
     public void OnTriggerEnter(Collider other)
     {
+        if (level == null) return;
+
         if (other.tag == "Player")
         {
+            PlayAudioZap();
             level.Trigger(this, TriggerInteractionType.Portal_Player, new ExtraTriggerData() { objectSize = GameConsts.playerBounds.size, colliderLevelItem = other });
         }
         else if (other.tag == "Inanimate")
         {
+            PlayAudioZap();
+
             Renderer mr = other.gameObject.GetComponent<Renderer>();
 
             level.Trigger(this, TriggerInteractionType.Portal_Inanimate, new ExtraTriggerData() { objectSize = mr.bounds.size, colliderLevelItem = other });
         }
+    }
+
+    public void PlayAudioZap()
+    {
+        AudioSource audioSource;
+        if (transform.position.x >= 5)
+        {
+            audioSource = PortalsAudio.INSTANCE.right;
+        } else if (transform.position.x <= -5) {
+            audioSource = PortalsAudio.INSTANCE.left;
+        } else
+        {
+            audioSource = PortalsAudio.INSTANCE.center;
+        }
+
+        audioSource.clip = zapNoises[Random.Range(0, zapNoises.Count)];
+        audioSource.Play();
     }
 
     protected void Awake()

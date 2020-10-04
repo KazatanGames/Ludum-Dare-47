@@ -62,6 +62,11 @@ MonoBehaviour:
   portalLight: {fileID: 7405932795187420462}
   moveDistance: -0.15
   frontRenderer: {fileID: 3538720303111227407}
+  audioSource: {fileID: 0}
+  zapNoises:
+  - {fileID: 8300000, guid: b6778ae8cef07ac4f96e7bd16cacaf08, type: 3}
+  - {fileID: 8300000, guid: bdf9cd132e83d8b42aea06f8e963260b, type: 3}
+  - {fileID: 8300000, guid: 0dd79848622905041aee445f658f4388, type: 3}
 --- !u!1 &3538720303111227402
 GameObject:
   m_ObjectHideFlags: 0

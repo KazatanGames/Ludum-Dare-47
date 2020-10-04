@@ -114,11 +114,15 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
     protected override void Initialise()
     {
         inputManager = new InputManager();
-        UpdateMoonPosition();
-
         currentLevel = startingLevel;
         UpdateMoonPosition();
         DrawLevel();
+
+        playerGameItem.SetFlip(true);
+        playerRb.velocity = AppManager.INSTANCE.AppModel.playerVelocity;
+        playerRb.position = new Vector3(-6f, AppManager.INSTANCE.AppModel.playerY, playerRb.position.z);
+        isJumping = Mathf.Abs(playerRb.velocity.y) < 0.1f;
+        UpdatePlayerAnim();
     }
 
     protected void Update()
@@ -223,6 +227,8 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
         {
             isJumping = true;
             playerRb.AddForce(Vector3.up * jumpImpulse, ForceMode.Impulse);
+
+            playerGameItem.PlayAudioJump();
         }
 
         // reset inputs

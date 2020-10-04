@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 public class SfxStatic
 {
     public static AudioSource PlayClip(AudioClip clip) { return SfxManager.INSTANCE.SfxPlayClip(clip); }
@@ -9,4 +10,6 @@ public class SfxStatic
     public static AudioSource PlayUIClickOk() { return SfxManager.INSTANCE.SfxPlayRegistered(SfxRegisterEnum.UI_Click_Ok); }
     public static AudioSource PlayUIClickBad() { return SfxManager.INSTANCE.SfxPlayRegistered(SfxRegisterEnum.UI_Click_Bad); }
     public static AudioSource PlayUIClickIllegal() { return SfxManager.INSTANCE.SfxPlayRegistered(SfxRegisterEnum.UI_Click_Illegal); }
+
+    public static AudioSource PlayRandomClip(List<AudioClip> clips) { return PlayClip(clips[Random.Range(0, clips.Count)]); }
 }

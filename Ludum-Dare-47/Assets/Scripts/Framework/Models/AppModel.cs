@@ -14,6 +14,9 @@ public class AppModel
 
     public bool debugMode = false;
 
+    public float playerY;
+    public Vector3 playerVelocity;
+
     public AppModel()
     {
         // create instances of persistances and models here

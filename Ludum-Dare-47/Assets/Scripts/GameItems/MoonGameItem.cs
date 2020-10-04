@@ -14,22 +14,52 @@ public class MoonGameItem : MonoBehaviour
     [SerializeField]
     protected GameObject quad;
 
+    protected float ratioTime;
+
+    protected float currentRatio;
+    protected float oldRatio;
+    protected float targetRatio;
+
     public void SetPositionRatio(float ratio)
     {
-        if (ratio <= 0)
+        ratioTime = 0f;
+        oldRatio = currentRatio;
+        targetRatio = ratio;
+    }
+
+    private void Awake()
+    {
+        transform.position = startPosition;
+        moonLight.Point();
+
+        oldRatio = 0;
+        currentRatio = 0;
+        targetRatio = 0;
+    }
+
+    private void Update()
+    {
+        if (ratioTime >= 1) return;
+
+        ratioTime += Time.deltaTime;
+        currentRatio = Mathf.Lerp(oldRatio, targetRatio, Mathf.Clamp(ratioTime, 0, 1));
+
+
+        if (currentRatio <= 0)
         {
             transform.position = startPosition;
         }
-        else if (ratio >= 1)
+        else if (currentRatio >= 1)
         {
             transform.position = endPosition;
         }
-        else if (ratio == 0.5f)
+        else if (currentRatio == 0.5f)
         {
             transform.position = midPosition;
-        } else if (ratio < 0.5f)
+        }
+        else if (currentRatio < 0.5f)
         {
-            ratio = Mathf.InverseLerp(0, 0.5f, ratio);
+            float ratio = Easing.Quintic.InOut(Mathf.InverseLerp(0, 0.5f, currentRatio));
             float dx = midPosition.x - startPosition.x; //-3
             float dy = midPosition.y - startPosition.y; // 1
             transform.position = new Vector3(
@@ -40,7 +70,7 @@ public class MoonGameItem : MonoBehaviour
         }
         else
         {
-            ratio = Mathf.InverseLerp(0.5f, 1f, ratio);
+            float ratio = Easing.Quintic.InOut(Mathf.InverseLerp(0.5f, 1f, currentRatio));
             float dx = endPosition.x - midPosition.x;
             float dy = endPosition.y - midPosition.y;
             transform.position = new Vector3(
@@ -51,14 +81,6 @@ public class MoonGameItem : MonoBehaviour
         }
 
         moonLight.Point();
-        quad.transform.rotation = Quaternion.LookRotation(quad.transform.position - Camera.main.transform.position);
-    }
-
-    private void Awake()
-    {
-        transform.position = startPosition;
-        moonLight.Point();
-
         quad.transform.rotation = Quaternion.LookRotation(quad.transform.position - Camera.main.transform.position);
     }
 }
