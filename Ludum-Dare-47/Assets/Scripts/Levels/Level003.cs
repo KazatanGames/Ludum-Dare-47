@@ -36,7 +36,7 @@ public class Level003 : BaseLevel
 
         crate = CreateSimpleLevelItem(
             LevelItemType.Crate,
-            new Vector3(0, 10f, 0),
+            new Vector3(0, 8f, 0),
             Quaternion.AngleAxis(Random.Range(0f, 360f), Vector3.forward),
             parent
         );
@@ -66,7 +66,7 @@ public class Level003 : BaseLevel
                 GameObject.Destroy(crate);
                 crate = CreateSimpleLevelItem(
                     LevelItemType.Crate,
-                    new Vector3(0, 10f, 0),
+                    new Vector3(0, 8f, 0),
                     Quaternion.AngleAxis(Random.Range(0f, 360f), Vector3.forward),
                     savedParent
                 );

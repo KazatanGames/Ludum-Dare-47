@@ -1,5 +1,7 @@
 ﻿public enum LevelItemType
 {
     Portal,
-    Crate
+    Crate,
+    MediumPlatform,
+    Ball
 }

@@ -22,6 +22,8 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
     protected Vector3 initialPlayerPosition;
     [SerializeField]
     protected LevelItemPrefabMapSO prefabMap;
+    [SerializeField]
+    protected float playerStartX = -6;
 
     [Header("Testing")]
     protected int startingLevel;
@@ -52,9 +54,11 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
     // levels
     protected List<BaseLevel> levels = new List<BaseLevel>()
     {
+        new Level005(),
         new Level001(),
         new Level002(),
         new Level003(),
+        new Level004(),
         new LevelEnd(),
     };
 
@@ -70,26 +74,31 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
             IncrementLevel();
         }
 
-        if (tData.moveObject && extras.colliderLevelItem.attachedRigidbody != null)
+        if (tData.moveObject)
         {
-            Vector3 dPos = tData.playerPositionOffset;
+            TeleportableGameItem tgi = extras.colliderLevelItem.GetComponent<TeleportableGameItem>();
 
-            if (tData.playerPositionOffset.x > 0)
+            if (tgi != null)
             {
-                dPos -= new Vector3(extras.objectSize.x / 2f, 0, 0);
-            }
-            else if (tData.playerPositionOffset.x < 0)
-            {
-                dPos += new Vector3(extras.objectSize.x / 2f, 0, 0);
-            }
+                Vector3 dPos = tData.playerPositionOffset;
 
-            if (positionChanges.ContainsKey(extras.colliderLevelItem.attachedRigidbody))
-            {
-                positionChanges[extras.colliderLevelItem.attachedRigidbody] = dPos;
-            }
-            else
-            {
-                positionChanges.Add(extras.colliderLevelItem.attachedRigidbody, dPos);
+                if (tData.playerPositionOffset.x > 0)
+                {
+                    dPos -= new Vector3(extras.objectSize.x / 2f, 0, 0);
+                }
+                else if (tData.playerPositionOffset.x < 0)
+                {
+                    dPos += new Vector3(extras.objectSize.x / 2f, 0, 0);
+                }
+
+                if (positionChanges.ContainsKey(tgi.rigidBody))
+                {
+                    positionChanges[tgi.rigidBody] = dPos;
+                }
+                else
+                {
+                    positionChanges.Add(tgi.rigidBody, dPos);
+                }
             }
         }
     }
@@ -138,11 +147,13 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
         inputManager = new InputManager();
         currentLevel = startingLevel;
         UpdateMoonPosition();
-        DrawLevel();
 
         playerGameItem.SetFlip(true);
         playerRb.velocity = AppManager.INSTANCE.AppModel.playerVelocity;
-        playerRb.position = new Vector3(-6f, AppManager.INSTANCE.AppModel.playerY, playerRb.position.z);
+        playerRb.position = playerGameItem.transform.position = new Vector3(playerStartX, AppManager.INSTANCE.AppModel.playerY, playerRb.position.z);
+
+        DrawLevel();
+
         isJumping = Mathf.Abs(playerRb.velocity.y) < 0.1f;
         UpdatePlayerAnim();
     }
@@ -271,6 +282,7 @@ public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
         // position changes from triggered events
         foreach(KeyValuePair<Rigidbody, Vector3> keyValuePair in positionChanges)
         {
+            if (keyValuePair.Key == null) continue;
             keyValuePair.Key.position += keyValuePair.Value;
         }
         positionChanges.Clear();

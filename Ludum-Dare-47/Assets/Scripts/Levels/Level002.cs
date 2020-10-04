@@ -27,10 +27,11 @@ public class Level002 : BaseLevel
             parent
         );
         AddTrigger(rightPortal, TriggerInteractionType.Portal_Player, TriggerData.rightPortalNormal);
+        AddTrigger(rightPortal, TriggerInteractionType.Portal_Inanimate, TriggerData.rightPortalNormal);
 
         crate = CreateSimpleLevelItem(
             LevelItemType.Crate,
-            new Vector3(0, 10f, 0),
+            new Vector3(0, 8f, 0),
             Quaternion.AngleAxis(Random.Range(0f, 360f), Vector3.forward),
             parent
         );

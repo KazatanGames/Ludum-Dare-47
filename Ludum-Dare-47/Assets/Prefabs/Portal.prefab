@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3538720302321566308}
   m_Layer: 0
   m_Name: Portal
-  m_TagString: Portal
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -62,7 +62,6 @@ MonoBehaviour:
   portalLight: {fileID: 7405932795187420462}
   moveDistance: -0.15
   frontRenderer: {fileID: 3538720303111227407}
-  audioSource: {fileID: 0}
   zapNoises:
   - {fileID: 8300000, guid: b6778ae8cef07ac4f96e7bd16cacaf08, type: 3}
   - {fileID: 8300000, guid: bdf9cd132e83d8b42aea06f8e963260b, type: 3}
